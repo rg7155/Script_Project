@@ -9,9 +9,12 @@ print(req.read().decode('utf-8'))
 '''
 
 from tkinter import *
+from tkinter import ttk
 from tkinter import font
 #https://m.blog.naver.com/dukalee/221268775318
 from PIL import ImageTk, Image
+
+import localCode
 
 import tkinter.messagebox
 import  random
@@ -20,86 +23,107 @@ WINCX = 800
 WINCY = 600
 window = Tk()
 DataList = []
-
+BACKCOLOR = 'LightSlateGray'
 host = "smtp.gmail.com" # Gmail SMTP 서버 주소.
 port = "587"
 
 class MainGui:
     def InitInputImage(self):
         #LogoImage = PhotoImage(file='MyImage/Search.jpg')
+
         self.LogoImage = ImageTk.PhotoImage(Image.open('MyImage/Logo.png'))
-        self.LogoLabel = Label(window, image=self.LogoImage)
+        self.LogoLabel = Label(window, image=self.LogoImage, bg=BACKCOLOR)
         self.LogoLabel.pack()
-        self.LogoLabel.place(x=10, y=10)
+        self.LogoLabel.place(x=5, y=5)
+
+        self.NameImage = ImageTk.PhotoImage(Image.open('MyImage/findhome.png'))
+        self.NameLabel = Label(window, image=self.NameImage, bg=BACKCOLOR)
+        self.NameLabel.pack()
+        self.NameLabel.place(x=160, y=5)
 
         self.MenuButton=[0]*3
         self.MenuImage=[0]*3
 
         for x in range(3):
             if x == 0:
-                self.MenuImage[x] = ImageTk.PhotoImage(Image.open('MyImage/Search.jpg'))
+                self.MenuImage[x] = ImageTk.PhotoImage(Image.open('MyImage/Search.png'))
             elif x == 1:
                 self.MenuImage[x] = ImageTk.PhotoImage(Image.open('MyImage/Bookmark.png'))
             else:
                 self.MenuImage[x] = ImageTk.PhotoImage(Image.open('MyImage/Graph.png'))
 
-            self.MenuButton[x] = Button(window, image=self.MenuImage[x])
+            self.MenuButton[x] = Button(window, borderwidth=0, image=self.MenuImage[x], bg=BACKCOLOR)
             self.MenuButton[x].pack()
-            self.MenuButton[x].place(x=10, y=200 + x*150)
+            self.MenuButton[x].place(x=30, y=220 + x*120)
 
     def InitInputEmailandFileButton(self):
         global EmailButton
         global EmailImage
 
-        img = Image.open('MyImage/Gmail.png')
-        resize_img = img.resize((100, 80), Image.ANTIALIAS)
-        EmailImage = ImageTk.PhotoImage(resize_img)
-        EmailButton = Button(window, image=EmailImage, bg='white', command=self.EmailButtonAction)
+        EmailImage = ImageTk.PhotoImage(Image.open('MyImage/Gmail.png'))
+        EmailButton = Button(window, image=EmailImage, bg=BACKCOLOR, borderwidth=0, command=self.EmailButtonAction)
         EmailButton.pack()
-        EmailButton.place(x=450, y=450)
+        EmailButton.place(x=500, y=420)
 
         global FileButton
         global FileImage
 
-        img = Image.open('MyImage/File.png')
-        resize_img = img.resize((100, 80), Image.ANTIALIAS)
-        FileImage = ImageTk.PhotoImage(resize_img)
-        FileButton = Button(window, image=FileImage, bg='white', command=self.FileButtonAction)
+        FileImage = ImageTk.PhotoImage(Image.open('MyImage/File.png'))
+        # resize_img = img.resize((100, 80), Image.ANTIALIAS)
+        # FileImage = ImageTk.PhotoImage(resize_img)
+        FileButton = Button(window, image=FileImage, bg=BACKCOLOR, borderwidth=0, command=self.FileButtonAction)
         FileButton.pack()
-        FileButton.place(x=570, y=450)
+        FileButton.place(x=650, y=420)
 
     def InitSearchListBox(self):
-        global SearchListBox #정렬조건
-        ListBoxScrollbar = Scrollbar(window)
-        ListBoxScrollbar.pack()
-        ListBoxScrollbar.place(x=230, y=5)
+        global SearchComboBox #정렬조건
 
-        TempFont = font.Font(window, size=15, weight='bold', family='Consolas')
-        SearchListBox = Listbox(window, font=TempFont, activestyle='none',
-                                width=10, height=1, borderwidth=6, relief='ridge',
-                                yscrollcommand=ListBoxScrollbar.set)
+        self.TempFont = ('Consolas', 15)
 
-        SearchListBox.insert(1, "날짜")
-        SearchListBox.insert(2, "금액")
-        SearchListBox.insert(3, "지역 번호")
-        SearchListBox.pack()
-        SearchListBox.place(x=100, y=10)
+        SearchComboBox = ttk.Combobox(window, font=self.TempFont,state="readonly", width=10, values=["정렬기준",
+                                                                                  "날짜순",
+                                                                                  "기격순",
+                                                                                  "지역번호순"])
+        SearchComboBox.bind("<<ComboboxSelected>>", self.sidoSelected)
+        SearchComboBox.current(0)
+        SearchComboBox.place(x=150, y=120)
+    def InitSearchLocalList(self):
+        self.sigungulst = ["시/군/구"]
+        global sidoComboBox
+        global sigunguComboBox
 
-        ListBoxScrollbar.config(command=SearchListBox.yview)
+        sidoComboBox = ttk.Combobox(window,font=self.TempFont, state="readonly", width=7, values=["시/도",
+                                                    "서울특별시",
+                                                    "부산광역시",
+                                                    "인천광역시",
+                                                    "경기도"])
+        sidoComboBox.option_add('*TCombobox*Listbox.font', self.TempFont)
+        sidoComboBox.bind("<<ComboboxSelected>>", self.sidoSelected)
+        sidoComboBox.current(0)
+        sidoComboBox.place(x=150, y=160)
+
+        sigunguComboBox = ttk.Combobox(window, font=self.TempFont, width=12, values=self.sigungulst)
+        sigunguComboBox.option_add('*TCombobox*Listbox.font', self.TempFont)
+        #sigunguComboBox.bind("<<ComboboxSelected>>", self.sigunguSelected)
+        sigunguComboBox.current(0)
+        sigunguComboBox.place(x=260, y=160)
+
+    def sidoSelected(self, event):
+        if event.widget.current() == 0:
+            return
+        print(event.widget.get())
+        # 해당 시도와 일치하는 리스트 가져와서 시/군/구 리스트에 넣기
+        self.sigungulst.append("시/도")
+        self.sigungulst = localCode.Comboboxlst[event.widget.current()-1]
+        sigunguComboBox['values'] = self.sigungulst
 
     def InitInputLabel(self):
-        global InputLabel
-        TempFont = font.Font(window, size=15, weight='bold', family='Consolas')
-        InputLabel = Entry(window, font=TempFont, width=15, borderwidth=6, relief='ridge')
-        InputLabel.pack()
-        InputLabel.place(x=100, y=50)
-
-        SearchButton = Button(window, font=TempFont, text="검색", command=self.SearchButtonAction)
-        SearchButton.pack()
-        SearchButton.place(x=300, y=50)
+        self.SearchButton = Button(window, font=self.TempFont, text="검색", command=self.SearchButtonAction,
+                                   height=1,bg='DarkGray')
+        self.SearchButton.pack()
+        self.SearchButton.place(x=420, y=155)
 
     def SearchButtonAction(self):
-        global SearchListBox
 
         #SearchListBox.delete(0, 'end')
 
@@ -119,7 +143,7 @@ class MainGui:
         req = conn.getresponse()
         print(req.status, req.reason)
 
-        global DataList
+        global DataList, SearchComboBox
         DataList.clear()
 
         if req.status == 200:
@@ -142,11 +166,11 @@ class MainGui:
                                          int(subitems[2].firstChild.nodeValue), int(subitems[17].firstChild.nodeValue),int(subitems[18].firstChild.nodeValue)))
 
                 #정렬
-                iSearchIndex = SearchListBox.curselection()[0]
-                if iSearchIndex == 0:
+                iSearchIndex = SearchComboBox.current()
+                if iSearchIndex == 1:
                     print("날짜")
                     DataList.sort(key=lambda x : x[4])
-                elif iSearchIndex == 1:
+                elif iSearchIndex == 2:
                     print("금액")
                     DataList.sort(key=lambda x : x[1])
 
@@ -177,10 +201,10 @@ class MainGui:
         RenderTextScrollbar.place(x=450, y=200)
 
         TempFont = font.Font(window, size=20, family='Consolas')
-        RenderText = Text(window, width=45, height=35, borderwidth=6, relief='ridge',
+        RenderText = Text(window, font=self.TempFont, width=27, height=15, borderwidth=1,
                           yscrollcommand=RenderTextScrollbar.set)
         RenderText.pack()
-        RenderText.place(x=100, y=130)
+        RenderText.place(x=150, y=200)
         RenderTextScrollbar.config(command=RenderText.yview)
         #RenderTextScrollbar.pack(side=RIGHT, fill=Y)
 
@@ -250,17 +274,35 @@ class MainGui:
 
     def FileButtonAction(self):
         pass
+    def LogoWindow(self):
+        self.logoScreenImg = ImageTk.PhotoImage(Image.open('MyImage/logoScreen.PNG'))
+        self.logoScreenImgButton = Button(window, image=self.logoScreenImg, command=self.logoButtonAction)
+        self.logoScreenImgButton.pack()
+
+
+        #LogoLabel.place(x=10, y=10)
+    def logoButtonAction(self):
+        Canvas(window, bg=BACKCOLOR, width=WINCX, height=WINCY).pack()
+        self.logoScreenImgButton.destroy()
+        self.InitInputImage()
+        self.InitSearchListBox()
+        self.InitSearchLocalList()
+        self.InitInputLabel()
+        self.InitInputEmailandFileButton()
+        self.InitRenderText()
+        localCode.ReadLocalCode()
+        window.mainloop()
     def __init__(self):
         #window = Tk()
         window.title("Find Home")
         window.geometry("800x600")
-        #Canvas(window, bg='white', width=WINCX, height=WINCY).pack()
 
-        self.InitInputImage()
-        self.InitSearchListBox()
-        self.InitInputLabel()
-        self.InitInputEmailandFileButton()
-        self.InitRenderText()
+        self.LogoWindow()
+        # self.InitInputImage()
+        # self.InitSearchListBox()
+        # self.InitInputLabel()
+        # self.InitInputEmailandFileButton()
+        # self.InitRenderText()
 
         window.mainloop()
 
