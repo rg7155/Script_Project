@@ -79,26 +79,19 @@ class MainGui:
 
         #SearchListBox.delete(0, 'end')
 
-        #RenderText.configure(state='normal')
-        #RenderText.delete(0.0, END)
-        iSearchIndex = SearchListBox.curselection()[0]
-        if iSearchIndex == 0:
-            self.SearchData()
-        elif iSearchIndex == 1:
-            pass  # SearchGoodFoodService()
-        elif iSearchIndex == 2:
-            pass  # SearchMarket()
-        elif iSearchIndex == 3:
-            pass  # SearchCultural()
+        RenderText.configure(state='normal')
+        RenderText.delete(0.0, END)
 
-        #RenderText.configure(state='disabled')
+        self.SearchData()
+
+        RenderText.configure(state='disabled')
 
     def SearchData(self):
         import http.client
         from xml.dom.minidom import parse, parseString
         conn = http.client.HTTPConnection("openapi.molit.go.kr")
         conn.request("GET",
-                     "/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev?serviceKey=U9TRdwhUQTkPIk4fvhtKRx%2BGV970UoDYMjy%2Br3IHsDKyVaj5ToULtpWNGDe%2FGW1TvnVjX37G%2FwLhhk5TMP5IbQ%3D%3D&pageNo=1&numOfRows=10&LAWD_CD=11110&DEAL_YMD=202012")
+                     "/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev?serviceKey=U9TRdwhUQTkPIk4fvhtKRx%2BGV970UoDYMjy%2Br3IHsDKyVaj5ToULtpWNGDe%2FGW1TvnVjX37G%2FwLhhk5TMP5IbQ%3D%3D&pageNo=1&numOfRows=10&LAWD_CD=11110&DEAL_YMD=201612")
         req = conn.getresponse()
         print(req.status, req.reason)
 
@@ -119,52 +112,53 @@ class MainGui:
                     #print(item.nodeName)
                     if item.nodeName == "item":
                         subitems = item.childNodes
-                        print(subitems)
-                        if subitems[3].firstChild.nodeValue == InputLabel.get():
-                            pass
-                        elif subitems[5].firstChild.nodeValue == InputLabel.get():
-                            pass
-                        else:
-                            continue
+                        #print(subitems[10].firstChild.nodeValue, subitems[0].firstChild.nodeValue)
+                        DataList.append((subitems[10].firstChild.nodeValue,
+                                         subitems[0].firstChild.nodeValue,
+                                         int(subitems[2].firstChild.nodeValue), int(subitems[17].firstChild.nodeValue),int(subitems[18].firstChild.nodeValue)))
 
-                        if subitems[29].firstChild is not None:
-                            tel = str(subitems[29].firstChild.nodeValue)
-                            pass  # ?꾩떆
-                            if tel[0] is not '0':
-                                tel = "02-" + tel
-                                pass
-                            DataList.append((subitems[15].firstChild.nodeValue, subitems[13].firstChild.nodeValue, tel))
-                        else:
-                            DataList.append((subitems[15].firstChild.nodeValue, subitems[13].firstChild.nodeValue, "-"))
+                #정렬
+                iSearchIndex = SearchListBox.curselection()[0]
+                if iSearchIndex == 0:
+                    print("날짜")
+                    DataList.sort(key=lambda x : x[4])
+                elif iSearchIndex == 1:
+                    print("금액")
+                    DataList.sort(key=lambda x : x[1])
+
 
                 for i in range(len(DataList)):
                     RenderText.insert(INSERT, "[")
                     RenderText.insert(INSERT, i + 1)
                     RenderText.insert(INSERT, "] ")
-                    RenderText.insert(INSERT, "시설명: ")
+                    RenderText.insert(INSERT, "법정동: ")
                     RenderText.insert(INSERT, DataList[i][0])
                     RenderText.insert(INSERT, "\n")
-                    RenderText.insert(INSERT, "주소: ")
+                    RenderText.insert(INSERT, "거래금액: ")
                     RenderText.insert(INSERT, DataList[i][1])
                     RenderText.insert(INSERT, "\n")
-                    RenderText.insert(INSERT, "전화번호: ")
+                    RenderText.insert(INSERT, "날짜: ")
                     RenderText.insert(INSERT, DataList[i][2])
+                    RenderText.insert(INSERT, "년 ")
+                    RenderText.insert(INSERT, DataList[i][3])
+                    RenderText.insert(INSERT, "월 ")
+                    RenderText.insert(INSERT, DataList[i][4])
+                    RenderText.insert(INSERT, "일 ")
                     RenderText.insert(INSERT, "\n\n")
 
     def InitRenderText(self):
         global RenderText
-
         RenderTextScrollbar = Scrollbar(window)
         RenderTextScrollbar.pack()
-        RenderTextScrollbar.place(x=375, y=200)
+        RenderTextScrollbar.place(x=450, y=200)
 
-        TempFont = font.Font(window, size=10, family='Consolas')
+        TempFont = font.Font(window, size=20, family='Consolas')
         RenderText = Text(window, width=45, height=35, borderwidth=6, relief='ridge',
                           yscrollcommand=RenderTextScrollbar.set)
         RenderText.pack()
         RenderText.place(x=100, y=130)
         RenderTextScrollbar.config(command=RenderText.yview)
-        RenderTextScrollbar.pack(side=RIGHT, fill=BOTH)
+        #RenderTextScrollbar.pack(side=RIGHT, fill=Y)
 
         RenderText.configure(state='disabled')
 
@@ -172,9 +166,9 @@ class MainGui:
         #window = Tk()
         window.title("Find Home")
 
-        # window.geometry("800x600")
+        window.geometry("800x600")
 
-        Canvas(window, bg='white', width=WINCX, height=WINCY).pack()
+        #Canvas(window, bg='white', width=WINCX, height=WINCY).pack()
 
         self.InitInputImage()
         self.InitSearchListBox()

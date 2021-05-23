@@ -104,8 +104,8 @@ def SearchLibrary():
                         DataList.append((subitems[15].firstChild.nodeValue, subitems[13].firstChild.nodeValue, tel))
                     else:
                         DataList.append((subitems[15].firstChild.nodeValue, subitems[13].firstChild.nodeValue, "-"))
-
             for i in range(len(DataList)):
+                print(INSERT)
                 RenderText.insert(INSERT, "[")
                 RenderText.insert(INSERT, i + 1)
                 RenderText.insert(INSERT, "] ")
