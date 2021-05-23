@@ -138,8 +138,13 @@ class MainGui:
         import http.client
         from xml.dom.minidom import parse, parseString
         conn = http.client.HTTPConnection("openapi.molit.go.kr")
+
+        localCode = "41390"
+        year = "2016"
+        month = "12"
+
         conn.request("GET",
-                     "/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev?serviceKey=U9TRdwhUQTkPIk4fvhtKRx%2BGV970UoDYMjy%2Br3IHsDKyVaj5ToULtpWNGDe%2FGW1TvnVjX37G%2FwLhhk5TMP5IbQ%3D%3D&pageNo=1&numOfRows=10&LAWD_CD=11110&DEAL_YMD=201612")
+                     "/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev?serviceKey=U9TRdwhUQTkPIk4fvhtKRx%2BGV970UoDYMjy%2Br3IHsDKyVaj5ToULtpWNGDe%2FGW1TvnVjX37G%2FwLhhk5TMP5IbQ%3D%3D&pageNo=1&numOfRows=1000&LAWD_CD=" + localCode + "&DEAL_YMD=" + year + month)
         req = conn.getresponse()
         print(req.status, req.reason)
 
@@ -160,10 +165,15 @@ class MainGui:
                     #print(item.nodeName)
                     if item.nodeName == "item":
                         subitems = item.childNodes
-                        #print(subitems[10].firstChild.nodeValue, subitems[0].firstChild.nodeValue)
-                        DataList.append((subitems[10].firstChild.nodeValue,
+                        #print(subitems[10].firstChild)
+
+                        fixIndex = 0
+                        if subitems[8].firstChild.nodeValue != '0': # 도로명지상지하코드가 없을때 8이후 한칸씩 당김
+                            fixIndex = -1
+
+                        DataList.append((subitems[10 + fixIndex].firstChild.nodeValue,
                                          subitems[0].firstChild.nodeValue,
-                                         int(subitems[2].firstChild.nodeValue), int(subitems[17].firstChild.nodeValue),int(subitems[18].firstChild.nodeValue)))
+                                         int(subitems[2].firstChild.nodeValue), int(subitems[17 + fixIndex].firstChild.nodeValue),int(subitems[18 + fixIndex].firstChild.nodeValue)))
 
                 #정렬
                 iSearchIndex = SearchComboBox.current()
