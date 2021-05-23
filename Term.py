@@ -41,11 +41,11 @@ class MainGui:
             elif x == 1:
                 self.MenuImage[x] = ImageTk.PhotoImage(Image.open('MyImage/Bookmark.png'))
             else:
-                MenuImage[x] = ImageTk.PhotoImage(Image.open('MyImage/Graph.png'))
+                self.MenuImage[x] = ImageTk.PhotoImage(Image.open('MyImage/Graph.png'))
 
-            MenuButton[x] = Button(window, image=MenuImage[x])
-            MenuButton[x].pack()
-            MenuButton[x].place(x=10, y=200 + x*150)
+            self.MenuButton[x] = Button(window, image=self.MenuImage[x])
+            self.MenuButton[x].pack()
+            self.MenuButton[x].place(x=10, y=200 + x*150)
 
     def InitInputEmailandFileButton(self):
         global EmailButton
@@ -67,12 +67,6 @@ class MainGui:
         FileButton = Button(window, image=FileImage, bg='white', command=self.FileButtonAction)
         FileButton.pack()
         FileButton.place(x=570, y=450)
-
-        self.MenuImage[x] = ImageTk.PhotoImage(Image.open('MyImage/Graph.png'))
-
-        self.MenuButton[x] = Button(window, image=self.MenuImage[x])
-        self.MenuButton[x].pack()
-        self.MenuButton[x].place(x=10, y=200 + x*150)
 
     def InitSearchListBox(self):
         global SearchListBox #정렬조건
