@@ -20,6 +20,9 @@ WINCX = 800
 WINCY = 600
 window = Tk()
 
+host = "smtp.gmail.com" # Gmail SMTP 서버 주소.
+port = "587"
+
 class MainGui:
     def InitInputImage(self):
         global LogoLabel
@@ -47,6 +50,26 @@ class MainGui:
             MenuButton[x].pack()
             MenuButton[x].place(x=10, y=200 + x*150)
 
+    def InitInputEmailandFileButton(self):
+        global EmailButton
+        global EmailImage
+
+        img = Image.open('MyImage/Gmail.png')
+        resize_img = img.resize((100, 80), Image.ANTIALIAS)
+        EmailImage = ImageTk.PhotoImage(resize_img)
+        EmailButton = Button(window, image=EmailImage, bg='white', command=self.EmailButtonAction)
+        EmailButton.pack()
+        EmailButton.place(x=450, y=450)
+
+        global FileButton
+        global FileImage
+
+        img = Image.open('MyImage/File.png')
+        resize_img = img.resize((100, 80), Image.ANTIALIAS)
+        FileImage = ImageTk.PhotoImage(resize_img)
+        FileButton = Button(window, image=FileImage, bg='white', command=self.FileButtonAction)
+        FileButton.pack()
+        FileButton.place(x=570, y=450)
 
 
     def InitSearchListBox(self):
@@ -79,21 +102,87 @@ class MainGui:
         SearchButton.pack()
         SearchButton.place(x=300, y=50)
 
-
     def SearchButtonAction(self):
         pass
 
+    def EmailButtonAction(self):
+        # 보내는 이메일 주소적기
+        EmailWindow = Tk()
+        EmailWindow.title("Email 주소입력")
+        sw = window.winfo_screenwidth()
+        sh = window.winfo_screenheight()
+
+        x = (sw-350) // 2
+        y = (sh-200) // 2
+
+        EmailWindow.geometry("{0}x{1}+{2}+{3}".format(350, 50, x, y))
+        Label(EmailWindow, text="Send To", font=("Consolas", 15)).pack()
+        self.emailEntry = Entry(EmailWindow, width=25, bg='white', font=("Consolas", 15))
+        self.emailEntry.pack(side='left')
+        sendButton = Button(EmailWindow, text='send', font=("Consolas", 18),
+                            command=self.sendMail)
+
+        sendButton.pack(side='left')
+        EmailWindow.mainloop()
+
+    def sendMail(self):
+        global host, port
+        html = ""
+        title = "아파트 매매 가격 정보"
+        senderAddr = "sungzzuu@gmail.com"
+        recipientAddr = self.emailEntry.get()
+        passwd = "tjdwn*yunsj00"
+        #html = MakeHtmlDoc(SearchBookTitle(keyword))
+
+        import mysmtplib
+
+        # MIMEMultipart의 MIME을 생성합니다.
+        from email.mime.multipart import MIMEMultipart
+        from email.mime.text import MIMEText
+
+        # Message container를 생성합니다.
+        msg = MIMEMultipart('alternative')
+
+        # set message
+        msg['Subject'] = title
+        msg['From'] = senderAddr
+        msg['To'] = recipientAddr
+        msgtext = 'Test'
+        msgPart = MIMEText(msgtext, 'plain')
+        #bookPart = MIMEText(html, 'html', _charset='UTF-8')
+
+        # 메세지에 생성한 MIME 문서를 첨부합니다.
+        msg.attach(msgPart)
+        #msg.attach(bookPart)
+
+        print("connect smtp server ... ")
+        s = mysmtplib.MySMTP(host, port)
+        # s.set_debuglevel(1)
+        s.ehlo()
+        s.starttls()
+        s.ehlo()
+        s.login(senderAddr, passwd)  # 로긴을 합니다.
+        s.sendmail(senderAddr, [recipientAddr], msg.as_string())
+        s.close()
+
+        print("Mail sending complete!!!")
+
+    def FileButtonAction(self):
+        pass
     def __init__(self):
         #window = Tk()
         window.title("Find Home")
 
-        self.canvas = Canvas(window,bg='white', width=WINCX, height=WINCY)
+        self.canvas = Canvas(window, bg='white', width=WINCX, height=WINCY)
         self.canvas.pack()
 
         self.InitInputImage()
         self.InitSearchListBox()
         self.InitInputLabel()
+        self.InitInputEmailandFileButton()
 
         window.mainloop()
+
+
 
 MainGui()
