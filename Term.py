@@ -82,11 +82,28 @@ class MainGui:
 
         SearchComboBox = ttk.Combobox(window, font=self.TempFont,state="readonly", width=10, values=["정렬기준",
                                                                                   "날짜순",
-                                                                                  "기격순",
+                                                                                  "가격순",
                                                                                   "지역번호순"])
         SearchComboBox.bind("<<ComboboxSelected>>", self.sidoSelected)
         SearchComboBox.current(0)
         SearchComboBox.place(x=150, y=120)
+
+        #정렬 라디오
+        self.radioVar = IntVar()
+        #radio = Radiobutton(window, text="1번", value=3, variable=RadioVariety_1, command=check)
+        self.radioDownOrder = Radiobutton(window, text="내림차순", value=1, variable=self.radioVar)
+        self.radioDownOrder.pack()
+        self.radioDownOrder.place(x=300, y=120)
+        #self.radioDownOrder.highlightcolor(1,1,1)
+
+        self.radioUpOrder = Radiobutton(window, text="오름차순", value=2, variable=self.radioVar)
+        self.radioUpOrder.pack()
+        self.radioUpOrder.place(x=370, y=120)
+        self.radioUpOrder.select()
+
+
+
+
     def InitSearchLocalList(self):
         self.sigungulst = ["시/군/구"]
         global sidoComboBox
@@ -101,7 +118,6 @@ class MainGui:
         sidoComboBox.bind("<<ComboboxSelected>>", self.sidoSelected)
         sidoComboBox.current(0)
         sidoComboBox.place(x=150, y=160)
-
         sigunguComboBox = ttk.Combobox(window, font=self.TempFont, width=12, values=self.sigungulst)
         sigunguComboBox.option_add('*TCombobox*Listbox.font', self.TempFont)
         #sigunguComboBox.bind("<<ComboboxSelected>>", self.sigunguSelected)
@@ -139,12 +155,13 @@ class MainGui:
         from xml.dom.minidom import parse, parseString
         conn = http.client.HTTPConnection("openapi.molit.go.kr")
 
-        localCode = "41390"
+        Code = localCode.Locallst[sidoComboBox.current()-1][sigunguComboBox.current()][0]
+        print("지역코드:", Code)
         year = "2016"
         month = "12"
 
         conn.request("GET",
-                     "/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev?serviceKey=U9TRdwhUQTkPIk4fvhtKRx%2BGV970UoDYMjy%2Br3IHsDKyVaj5ToULtpWNGDe%2FGW1TvnVjX37G%2FwLhhk5TMP5IbQ%3D%3D&pageNo=1&numOfRows=1000&LAWD_CD=" + localCode + "&DEAL_YMD=" + year + month)
+                     "/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev?serviceKey=U9TRdwhUQTkPIk4fvhtKRx%2BGV970UoDYMjy%2Br3IHsDKyVaj5ToULtpWNGDe%2FGW1TvnVjX37G%2FwLhhk5TMP5IbQ%3D%3D&pageNo=1&numOfRows=1000&LAWD_CD=" + Code + "&DEAL_YMD=" + year + month)
         req = conn.getresponse()
         print(req.status, req.reason)
 
@@ -176,14 +193,29 @@ class MainGui:
                                          int(subitems[2].firstChild.nodeValue), int(subitems[17 + fixIndex].firstChild.nodeValue),int(subitems[18 + fixIndex].firstChild.nodeValue)))
 
                 #정렬
+                print("라디오 인덱", self.radioVar.get())
+
                 iSearchIndex = SearchComboBox.current()
+                print(iSearchIndex)
+
                 if iSearchIndex == 1:
                     print("날짜")
-                    DataList.sort(key=lambda x : x[4])
+                    if self.radioVar.get() == 1:
+                        DataList.sort(key=lambda x : x[4], reverse= True)
+                    else:
+                        DataList.sort(key=lambda x : x[4])
                 elif iSearchIndex == 2:
                     print("금액")
-                    DataList.sort(key=lambda x : x[1])
-
+                    if self.radioVar.get() == 1:
+                        DataList.sort(key=lambda x : x[1], reverse= True)
+                    else:
+                        DataList.sort(key=lambda x : x[1])
+                elif iSearchIndex == 3:
+                    print("지역이름")
+                    if self.radioVar.get() == 1:
+                        DataList.sort(key=lambda x: x[0], reverse=True)
+                    else:
+                        DataList.sort(key=lambda x: x[0])
 
                 for i in range(len(DataList)):
                     RenderText.insert(INSERT, "[")
@@ -206,17 +238,22 @@ class MainGui:
 
     def InitRenderText(self):
         global RenderText
-        RenderTextScrollbar = Scrollbar(window)
-        RenderTextScrollbar.pack()
-        RenderTextScrollbar.place(x=450, y=200)
+        frame = Frame(window, width = 100, height = 170, relief = 'raised')
+        frame.pack()
+        frame.place(x=150, y=200)
 
-        TempFont = font.Font(window, size=20, family='Consolas')
-        RenderText = Text(window, font=self.TempFont, width=27, height=15, borderwidth=1,
+        RenderTextScrollbar = Scrollbar(frame)
+        RenderTextScrollbar.pack()
+        #RenderTextScrollbar.place(x=450, y=200)
+
+        TempFont = font.Font(frame, size=20, family='Consolas')
+        RenderText = Text(frame, font=self.TempFont, width=27, height=15, borderwidth=1,
                           yscrollcommand=RenderTextScrollbar.set)
         RenderText.pack()
-        RenderText.place(x=150, y=200)
+        #RenderText.place(x=150, y=200)
+
         RenderTextScrollbar.config(command=RenderText.yview)
-        #RenderTextScrollbar.pack(side=RIGHT, fill=Y)
+        RenderTextScrollbar.pack(side=RIGHT, fill=Y)
 
         RenderText.configure(state='disabled')
 
@@ -284,6 +321,7 @@ class MainGui:
 
     def FileButtonAction(self):
         pass
+
     def LogoWindow(self):
         self.logoScreenImg = ImageTk.PhotoImage(Image.open('MyImage/logoScreen.PNG'))
         self.logoScreenImgButton = Button(window, image=self.logoScreenImg, command=self.logoButtonAction)
@@ -302,6 +340,7 @@ class MainGui:
         self.InitRenderText()
         localCode.ReadLocalCode()
         window.mainloop()
+
     def __init__(self):
         #window = Tk()
         window.title("Find Home")
