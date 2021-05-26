@@ -15,7 +15,7 @@ from tkinter import font
 from PIL import ImageTk, Image
 
 import localCode
-
+from Bookmark import *
 import tkinter.messagebox
 import  random
 
@@ -26,6 +26,7 @@ DataList = []
 BACKCOLOR = 'LightSlateGray'
 host = "smtp.gmail.com" # Gmail SMTP 서버 주소.
 port = "587"
+bookmark = BookMark()
 
 class MainGui:
     def InitInputImage(self):
@@ -246,7 +247,7 @@ class MainGui:
                         DataList.sort(key=lambda x: x[0])
 
                 #스크롤 크기 재조정
-                SearchCanvas.config(scrollregion=(0, 0, 50, len(DataList) * 100))
+                SearchCanvas.config(scrollregion=(0, 0, 50, len(DataList) * 88))
 
                 #버튼 삭제
                 for x in range(len(SearchDataButtonList)):
@@ -255,7 +256,8 @@ class MainGui:
                 for i in range(len(DataList)):
                     but = Button(self.ButtonFrame, text="법정동: " + DataList[i][0] +
                                                         "\n 가격: " + DataList[i][1] +
-                                                        "\n 날짜: " + str(DataList[i][2])+ "년 " + str(DataList[i][3]) + "월 " + str(DataList[i][4]) + "일", width=38, height=5)
+                                                        "\n 날짜: " + str(DataList[i][2])+ "년 " + str(DataList[i][3]) + "월 " + str(DataList[i][4]) + "일", width=38, height=5,
+                                 command=lambda col=i: self.DataButtonAction(col))
 
                     but.grid(row=i)
                     SearchDataButtonList.append(but)
@@ -280,7 +282,10 @@ class MainGui:
                     RenderText.insert(INSERT, "일 ")
                     RenderText.insert(INSERT, "\n\n")
                 '''
-
+    def DataButtonAction(self, col):
+        tkinter.messagebox.showinfo('저장성공','즐겨찾기에 저장했습니다.')
+        bookmark.insertBookmark(DataList[col])
+        print(DataList[col])
     def InitRenderText(self):
         global RenderText
         frame = Frame(window, width = 100, height = 170, relief = 'raised')
@@ -368,7 +373,7 @@ class MainGui:
         msg['Subject'] = title
         msg['From'] = senderAddr
         msg['To'] = recipientAddr
-        msgtext = 'Test'
+        msgtext = bookmark.getBookMarkList()
         msgPart = MIMEText(msgtext, 'plain')
         #bookPart = MIMEText(html, 'html', _charset='UTF-8')
 
