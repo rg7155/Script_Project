@@ -102,8 +102,6 @@ class MainGui:
         self.radioUpOrder.select()
 
 
-
-
     def InitSearchLocalList(self):
         self.sigungulst = ["시/군/구"]
         global sidoComboBox
@@ -118,11 +116,36 @@ class MainGui:
         sidoComboBox.bind("<<ComboboxSelected>>", self.sidoSelected)
         sidoComboBox.current(0)
         sidoComboBox.place(x=150, y=160)
+
         sigunguComboBox = ttk.Combobox(window, font=self.TempFont, width=12, values=self.sigungulst)
         sigunguComboBox.option_add('*TCombobox*Listbox.font', self.TempFont)
         #sigunguComboBox.bind("<<ComboboxSelected>>", self.sigunguSelected)
         sigunguComboBox.current(0)
         sigunguComboBox.place(x=260, y=160)
+
+
+        self.yearList = ['년도']
+        for x in range(10):
+            self.yearList.append(2020-x)
+
+        self.monthList = ['월']
+        for x in range(12):
+            self.monthList.append(x+1)
+
+        global yearComboBox
+        global monthComboBox
+        yearComboBox = ttk.Combobox(window,font=self.TempFont, state="readonly", width=7, values=self.yearList)
+        yearComboBox.option_add('*TCombobox*Listbox.font', self.TempFont)
+        yearComboBox.bind("<<ComboboxSelected>>")
+        yearComboBox.current(0)
+        yearComboBox.place(x=550, y=150)
+
+        monthComboBox = ttk.Combobox(window,font=self.TempFont, state="readonly", width=7, values=self.monthList)
+        monthComboBox.option_add('*TCombobox*Listbox.font', self.TempFont)
+        monthComboBox.bind("<<ComboboxSelected>>")
+        monthComboBox.current(0)
+        monthComboBox.place(x=650, y=150)
+
 
     def sidoSelected(self, event):
         if event.widget.current() == 0:
@@ -157,8 +180,16 @@ class MainGui:
 
         Code = localCode.Locallst[sidoComboBox.current()-1][sigunguComboBox.current()][0]
         print("지역코드:", Code)
-        year = "2016"
-        month = "12"
+        year = str(2021-yearComboBox.current())
+        print("년",year)
+        month = str(monthComboBox.current())
+        if monthComboBox.current() <= 9:
+            month = '0' + str(monthComboBox.current())
+        print("달",month)
+
+        #year = '2016'
+        #month = '12'
+
 
         conn.request("GET",
                      "/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev?serviceKey=U9TRdwhUQTkPIk4fvhtKRx%2BGV970UoDYMjy%2Br3IHsDKyVaj5ToULtpWNGDe%2FGW1TvnVjX37G%2FwLhhk5TMP5IbQ%3D%3D&pageNo=1&numOfRows=1000&LAWD_CD=" + Code + "&DEAL_YMD=" + year + month)
@@ -193,7 +224,6 @@ class MainGui:
                                          int(subitems[2].firstChild.nodeValue), int(subitems[17 + fixIndex].firstChild.nodeValue),int(subitems[18 + fixIndex].firstChild.nodeValue)))
 
                 #정렬
-                print("라디오 인덱", self.radioVar.get())
 
                 iSearchIndex = SearchComboBox.current()
                 print(iSearchIndex)
