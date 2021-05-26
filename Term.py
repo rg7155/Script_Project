@@ -44,6 +44,8 @@ class MainGui:
         self.MenuButton=[0]*3
         self.MenuImage=[0]*3
 
+
+
         for x in range(3):
             if x == 0:
                 self.MenuImage[x] = ImageTk.PhotoImage(Image.open('MyImage/Search.png'))
@@ -107,17 +109,18 @@ class MainGui:
         global sidoComboBox
         global sigunguComboBox
 
-        sidoComboBox = ttk.Combobox(window,font=self.TempFont, state="readonly", width=7, values=["시/도",
+        sidoComboBox = ttk.Combobox(window, font=self.TempFont, state="readonly", width=7, values=["시/도",
                                                     "서울특별시",
                                                     "부산광역시",
                                                     "인천광역시",
                                                     "경기도"])
+
         sidoComboBox.option_add('*TCombobox*Listbox.font', self.TempFont)
         sidoComboBox.bind("<<ComboboxSelected>>", self.sidoSelected)
         sidoComboBox.current(0)
         sidoComboBox.place(x=150, y=160)
 
-        sigunguComboBox = ttk.Combobox(window, font=self.TempFont, width=12, values=self.sigungulst)
+        sigunguComboBox = ttk.Combobox(window, font=self.TempFont, state="readonly", width=12, values=self.sigungulst)
         sigunguComboBox.option_add('*TCombobox*Listbox.font', self.TempFont)
         #sigunguComboBox.bind("<<ComboboxSelected>>", self.sigunguSelected)
         sigunguComboBox.current(0)
@@ -134,18 +137,18 @@ class MainGui:
 
         global yearComboBox
         global monthComboBox
+
         yearComboBox = ttk.Combobox(window,font=self.TempFont, state="readonly", width=7, values=self.yearList)
         yearComboBox.option_add('*TCombobox*Listbox.font', self.TempFont)
         yearComboBox.bind("<<ComboboxSelected>>")
         yearComboBox.current(0)
-        yearComboBox.place(x=550, y=150)
+        yearComboBox.place(x=150, y=200)
 
         monthComboBox = ttk.Combobox(window,font=self.TempFont, state="readonly", width=7, values=self.monthList)
         monthComboBox.option_add('*TCombobox*Listbox.font', self.TempFont)
         monthComboBox.bind("<<ComboboxSelected>>")
         monthComboBox.current(0)
-        monthComboBox.place(x=650, y=150)
-
+        monthComboBox.place(x=260, y=200)
 
     def sidoSelected(self, event):
         if event.widget.current() == 0:
@@ -158,7 +161,7 @@ class MainGui:
 
     def InitInputLabel(self):
         self.SearchButton = Button(window, font=self.TempFont, text="검색", command=self.SearchButtonAction,
-                                   height=1,bg='DarkGray')
+                                   height=1, bg='DarkGray')
         self.SearchButton.pack()
         self.SearchButton.place(x=420, y=155)
 
@@ -270,14 +273,14 @@ class MainGui:
         global RenderText
         frame = Frame(window, width = 100, height = 170, relief = 'raised')
         frame.pack()
-        frame.place(x=150, y=200)
+        frame.place(x=150, y=240)
 
         RenderTextScrollbar = Scrollbar(frame)
         RenderTextScrollbar.pack()
         #RenderTextScrollbar.place(x=450, y=200)
 
         TempFont = font.Font(frame, size=20, family='Consolas')
-        RenderText = Text(frame, font=self.TempFont, width=27, height=15, borderwidth=1,
+        RenderText = Text(frame, font=self.TempFont, width=27, height=14, borderwidth=1,
                           yscrollcommand=RenderTextScrollbar.set)
         RenderText.pack()
         #RenderText.place(x=150, y=200)
