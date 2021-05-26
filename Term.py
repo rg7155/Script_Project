@@ -166,15 +166,12 @@ class MainGui:
         self.SearchButton.place(x=420, y=155)
 
     def SearchButtonAction(self):
-
-        #SearchListBox.delete(0, 'end')
-
-        RenderText.configure(state='normal')
-        RenderText.delete(0.0, END)
+        #RenderText.configure(state='normal')
+        #RenderText.delete(0.0, END)
 
         self.SearchData()
 
-        RenderText.configure(state='disabled')
+        #RenderText.configure(state='disabled')
 
     def SearchData(self):
         import http.client
@@ -192,7 +189,6 @@ class MainGui:
 
         #year = '2016'
         #month = '12'
-
 
         conn.request("GET",
                      "/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev?serviceKey=U9TRdwhUQTkPIk4fvhtKRx%2BGV970UoDYMjy%2Br3IHsDKyVaj5ToULtpWNGDe%2FGW1TvnVjX37G%2FwLhhk5TMP5IbQ%3D%3D&pageNo=1&numOfRows=1000&LAWD_CD=" + Code + "&DEAL_YMD=" + year + month)
@@ -227,7 +223,6 @@ class MainGui:
                                          int(subitems[2].firstChild.nodeValue), int(subitems[17 + fixIndex].firstChild.nodeValue),int(subitems[18 + fixIndex].firstChild.nodeValue)))
 
                 #정렬
-
                 iSearchIndex = SearchComboBox.current()
                 print(iSearchIndex)
 
@@ -250,6 +245,22 @@ class MainGui:
                     else:
                         DataList.sort(key=lambda x: x[0])
 
+                #스크롤 크기 재조정
+                SearchCanvas.config(scrollregion=(0, 0, 50, len(DataList) * 100))
+
+                #버튼 삭제
+                for x in range(len(SearchDataButtonList)):
+                    SearchDataButtonList[x].destroy()
+
+                for i in range(len(DataList)):
+                    but = Button(self.ButtonFrame, text="법정동: " + DataList[i][0] +
+                                                        "\n 가격: " + DataList[i][1] +
+                                                        "\n 날짜: " + str(DataList[i][2])+ "년 " + str(DataList[i][3]) + "월 " + str(DataList[i][4]) + "일", width=38, height=5)
+
+                    but.grid(row=i)
+                    SearchDataButtonList.append(but)
+
+                '''
                 for i in range(len(DataList)):
                     RenderText.insert(INSERT, "[")
                     RenderText.insert(INSERT, i + 1)
@@ -268,6 +279,7 @@ class MainGui:
                     RenderText.insert(INSERT, DataList[i][4])
                     RenderText.insert(INSERT, "일 ")
                     RenderText.insert(INSERT, "\n\n")
+                '''
 
     def InitRenderText(self):
         global RenderText
@@ -275,6 +287,7 @@ class MainGui:
         frame.pack()
         frame.place(x=150, y=240)
 
+        '''
         RenderTextScrollbar = Scrollbar(frame)
         RenderTextScrollbar.pack()
         #RenderTextScrollbar.place(x=450, y=200)
@@ -289,6 +302,29 @@ class MainGui:
         RenderTextScrollbar.pack(side=RIGHT, fill=Y)
 
         RenderText.configure(state='disabled')
+        '''
+
+        global SearchCanvas
+        SearchCanvas = Canvas(frame, bg='#FFFFFF', width=300, height=300, scrollregion=(0, 0, 50, 1000))
+        bar = Scrollbar(frame, orient=VERTICAL)
+        bar.pack(side=RIGHT, fill=Y)
+        bar.config(command=SearchCanvas.yview)
+        SearchCanvas.config(width=300, height=300)
+        SearchCanvas.config(yscrollcommand=bar.set)
+        SearchCanvas.pack(side=LEFT, expand=True, fill=BOTH)
+        self.ButtonFrame = Frame(frame)
+
+        global SearchDataButtonList
+        SearchDataButtonList = []
+        for _ in range(10):
+            but = Button(self.ButtonFrame, text=str(_) + "법정동:\n 가격:", width = 38, height = 5)
+            but.grid(row=_)
+            SearchDataButtonList.append(but)
+        SearchDataButtonList[0].destroy()
+
+        SearchCanvas.create_window(0, 0, anchor='nw', window=self.ButtonFrame)
+
+
 
     def EmailButtonAction(self):
         # 보내는 이메일 주소적기
