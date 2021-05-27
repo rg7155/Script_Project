@@ -19,8 +19,8 @@ from Bookmark import *
 import tkinter.messagebox
 import  random
 
-WINCX = 800
-WINCY = 600
+WINCX = 1280
+WINCY = 720
 window = Tk()
 DataList = []
 BACKCOLOR = 'LightSlateGray'
@@ -91,19 +91,35 @@ class MainGui:
         SearchComboBox.current(0)
         SearchComboBox.place(x=150, y=120)
 
-        #정렬 라디오
-        self.radioVar = IntVar()
-        #radio = Radiobutton(window, text="1번", value=3, variable=RadioVariety_1, command=check)
-        self.radioDownOrder = Radiobutton(window, text="내림차순", value=1, variable=self.radioVar)
-        self.radioDownOrder.pack()
-        self.radioDownOrder.place(x=300, y=120)
-        #self.radioDownOrder.highlightcolor(1,1,1)
 
-        self.radioUpOrder = Radiobutton(window, text="오름차순", value=2, variable=self.radioVar)
-        self.radioUpOrder.pack()
-        self.radioUpOrder.place(x=370, y=120)
-        self.radioUpOrder.select()
 
+    def InitRadioButton(self):
+        # 정렬 라디오
+        self.radioUpDownVar = IntVar()
+        radioDownOrder = Radiobutton(window, text="내림차순", value=1, variable=self.radioUpDownVar)
+        radioDownOrder.pack()
+        radioDownOrder.place(x=300, y=120)
+        # self.radioDownOrder.highlightcolor(1,1,1)
+
+        radioUpOrder = Radiobutton(window, text="오름차순", value=2, variable=self.radioUpDownVar)
+        radioUpOrder.pack()
+        radioUpOrder.place(x=370, y=120)
+        radioUpOrder.select()
+
+        # 검색 라디오
+        self.radioSearchTypeVar = IntVar()
+        radioSale = Radiobutton(window, text="매매", value=1, variable=self.radioSearchTypeVar)
+        radioSale.pack()
+        radioSale.place(x=250, y=80)
+        radioSale.select()
+
+        radioJeonse = Radiobutton(window, text="전세", value=2, variable=self.radioSearchTypeVar)
+        radioJeonse.pack()
+        radioJeonse.place(x=300, y=80)
+
+        radioMonthRent = Radiobutton(window, text="월세", value=3, variable=self.radioSearchTypeVar)
+        radioMonthRent.pack()
+        radioMonthRent.place(x=350, y=80)
 
     def InitSearchLocalList(self):
         self.sigungulst = ["시/군/구"]
@@ -177,22 +193,28 @@ class MainGui:
     def SearchData(self):
         import http.client
         from xml.dom.minidom import parse, parseString
-        conn = http.client.HTTPConnection("openapi.molit.go.kr")
 
         Code = localCode.Locallst[sidoComboBox.current()-1][sigunguComboBox.current()][0]
-        print("지역코드:", Code)
+        #print("지역코드:", Code)
         year = str(2021-yearComboBox.current())
-        print("년",year)
+        #print("년",year)
         month = str(monthComboBox.current())
         if monthComboBox.current() <= 9:
             month = '0' + str(monthComboBox.current())
-        print("달",month)
-
+        #print("달",month)
         #year = '2016'
         #month = '12'
 
-        conn.request("GET",
-                     "/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev?serviceKey=U9TRdwhUQTkPIk4fvhtKRx%2BGV970UoDYMjy%2Br3IHsDKyVaj5ToULtpWNGDe%2FGW1TvnVjX37G%2FwLhhk5TMP5IbQ%3D%3D&pageNo=1&numOfRows=1000&LAWD_CD=" + Code + "&DEAL_YMD=" + year + month)
+        str1 = "openapi.molit.go.kr"
+        str2 = "/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev?serviceKey=U9TRdwhUQTkPIk4fvhtKRx%2BGV970UoDYMjy%2Br3IHsDKyVaj5ToULtpWNGDe%2FGW1TvnVjX37G%2FwLhhk5TMP5IbQ%3D%3D&pageNo=1&numOfRows=1000&LAWD_CD="
+
+        if self.radioSearchTypeVar.get() == 2:
+            str1 += ":8081"
+            str2 = "/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptRent?serviceKey=U9TRdwhUQTkPIk4fvhtKRx%2BGV970UoDYMjy%2Br3IHsDKyVaj5ToULtpWNGDe%2FGW1TvnVjX37G%2FwLhhk5TMP5IbQ%3D%3D&LAWD_CD="
+
+        conn = http.client.HTTPConnection(str1)
+        conn.request("GET", str2 + Code + "&DEAL_YMD=" + year + month)
+
         req = conn.getresponse()
         print(req.status, req.reason)
 
@@ -213,35 +235,46 @@ class MainGui:
                     #print(item.nodeName)
                     if item.nodeName == "item":
                         subitems = item.childNodes
-                        #print(subitems[10].firstChild)
 
-                        fixIndex = 0
-                        if subitems[8].firstChild.nodeValue != '0': # 도로명지상지하코드가 없을때 8이후 한칸씩 당김
-                            fixIndex = -1
+                        indList = [0]*5 #지역,금액,년,월,일
 
-                        DataList.append((subitems[10 + fixIndex].firstChild.nodeValue,
-                                         subitems[0].firstChild.nodeValue,
-                                         int(subitems[2].firstChild.nodeValue), int(subitems[17 + fixIndex].firstChild.nodeValue),int(subitems[18 + fixIndex].firstChild.nodeValue)))
+                        if self.radioSearchTypeVar.get() == 1: #매매
+                            fixIndex = 0
+                            if subitems[8].firstChild.nodeValue != '0': # 도로명지상지하코드가 없을때 8이후 한칸씩 당김
+                                fixIndex = -1
+
+                            indList[0] = 10 + fixIndex
+                            indList[1] = 0
+                            indList[2] = 2
+                            indList[3] = 17 + fixIndex
+                            indList[4] = 18 + fixIndex
+
+                        elif self.radioSearchTypeVar.get() == 2: #전세
+                            indList[0] = 2
+                            indList[1] = 3
+                            indList[2] = 1
+                            indList[3] = 5
+                            indList[4] = 7
+
+                        DataList.append((subitems[indList[0]].firstChild.nodeValue,
+                                         subitems[indList[1]].firstChild.nodeValue,
+                                         int(subitems[indList[2]].firstChild.nodeValue), int(subitems[indList[3]].firstChild.nodeValue),int(subitems[indList[4]].firstChild.nodeValue)))
+
 
                 #정렬
                 iSearchIndex = SearchComboBox.current()
-                print(iSearchIndex)
-
                 if iSearchIndex == 1:
-                    print("날짜")
-                    if self.radioVar.get() == 1:
+                    if self.radioUpDownVar.get() == 1:
                         DataList.sort(key=lambda x : x[4], reverse= True)
                     else:
                         DataList.sort(key=lambda x : x[4])
                 elif iSearchIndex == 2:
-                    print("금액")
-                    if self.radioVar.get() == 1:
+                    if self.radioUpDownVar.get() == 1:
                         DataList.sort(key=lambda x : x[1], reverse= True)
                     else:
                         DataList.sort(key=lambda x : x[1])
                 elif iSearchIndex == 3:
-                    print("지역이름")
-                    if self.radioVar.get() == 1:
+                    if self.radioUpDownVar.get() == 1:
                         DataList.sort(key=lambda x: x[0], reverse=True)
                     else:
                         DataList.sort(key=lambda x: x[0])
@@ -282,6 +315,8 @@ class MainGui:
                     RenderText.insert(INSERT, "일 ")
                     RenderText.insert(INSERT, "\n\n")
                 '''
+
+
     def DataButtonAction(self, col):
         tkinter.messagebox.showinfo('저장성공','즐겨찾기에 저장했습니다.')
         bookmark.insertBookmark(DataList[col])
@@ -310,7 +345,7 @@ class MainGui:
         '''
 
         global SearchCanvas
-        SearchCanvas = Canvas(frame, bg='#FFFFFF', width=300, height=300, scrollregion=(0, 0, 50, 1000))
+        SearchCanvas = Canvas(frame, bg='#FFFFFF', width=300, height=300, scrollregion=(0, 0, 50, 0))
         bar = Scrollbar(frame, orient=VERTICAL)
         bar.pack(side=RIGHT, fill=Y)
         bar.config(command=SearchCanvas.yview)
@@ -321,15 +356,8 @@ class MainGui:
 
         global SearchDataButtonList
         SearchDataButtonList = []
-        for _ in range(10):
-            but = Button(self.ButtonFrame, text=str(_) + "법정동:\n 가격:", width = 38, height = 5)
-            but.grid(row=_)
-            SearchDataButtonList.append(but)
-        SearchDataButtonList[0].destroy()
 
         SearchCanvas.create_window(0, 0, anchor='nw', window=self.ButtonFrame)
-
-
 
     def EmailButtonAction(self):
         # 보내는 이메일 주소적기
@@ -408,6 +436,7 @@ class MainGui:
         self.logoScreenImgButton.destroy()
         self.InitInputImage()
         self.InitSearchListBox()
+        self.InitRadioButton()
         self.InitSearchLocalList()
         self.InitInputLabel()
         self.InitInputEmailandFileButton()
@@ -418,7 +447,8 @@ class MainGui:
     def __init__(self):
         #window = Tk()
         window.title("Find Home")
-        window.geometry("800x600")
+
+        window.geometry(str(WINCX) + "x" + str(WINCY))
 
         self.LogoWindow()
         # self.InitInputImage()
