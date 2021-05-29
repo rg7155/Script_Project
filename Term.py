@@ -7,11 +7,10 @@ req = conn.getresponse()
 print(req.status,req.reason)
 print(req.read().decode('utf-8'))
 '''
-
+import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 from tkinter import font
-#https://m.blog.naver.com/dukalee/221268775318
 from PIL import ImageTk, Image
 
 import localCode
@@ -29,16 +28,43 @@ port = "587"
 bookmark = BookMark()
 
 class MainGui:
-    def InitInputImage(self):
-        #LogoImage = PhotoImage(file='MyImage/Search.jpg')
+    def InitNoteBook(self):
+        style = ttk.Style(window)
+        style.configure('lefttab.TNotebook', tabposition='w', background=BACKCOLOR)
 
+        notebook = ttk.Notebook(window, style='lefttab.TNotebook', width=WINCX, height=WINCY)
+
+        global FrSearch, FrBookMark, FrGraph
+        FrSearch = tk.Frame(notebook, bg=BACKCOLOR)
+        FrBookMark = tk.Frame(notebook, bg=BACKCOLOR)
+        FrGraph = tk.Frame(notebook, bg=BACKCOLOR)
+
+        self.im = Image.open('MyImage/Search.png')
+        self.ph = ImageTk.PhotoImage(self.im)
+        notebook.add(FrSearch, image = self.ph, compound=tk.TOP)
+
+        self.im1 = Image.open('MyImage/Bookmark.png')
+        self.ph1 = ImageTk.PhotoImage(self.im1)
+        notebook.add(FrBookMark, image = self.ph1, compound=tk.TOP)
+
+        self.im2 = Image.open('MyImage/Graph.png')
+        self.ph2 = ImageTk.PhotoImage(self.im2)
+        notebook.add(FrGraph, image = self.ph2, compound=tk.TOP)
+
+        notebook.pack()
+
+    def InitInputImage(self):
+        #LogoImage = PhotoImage(file='MyImage/Search.jpg'))
+
+        '''
         self.LogoImage = ImageTk.PhotoImage(Image.open('MyImage/Logo.png'))
-        self.LogoLabel = Label(window, image=self.LogoImage, bg=BACKCOLOR)
+        self.LogoLabel = Label(FrSearch, image=self.LogoImage, bg=BACKCOLOR)
         self.LogoLabel.pack()
         self.LogoLabel.place(x=5, y=5)
+        '''
 
         self.NameImage = ImageTk.PhotoImage(Image.open('MyImage/findhome.png'))
-        self.NameLabel = Label(window, image=self.NameImage, bg=BACKCOLOR)
+        self.NameLabel = Label(FrSearch, image=self.NameImage, bg=BACKCOLOR)
         self.NameLabel.pack()
         self.NameLabel.place(x=160, y=5)
 
@@ -46,7 +72,7 @@ class MainGui:
         self.MenuImage=[0]*3
 
 
-
+        '''
         for x in range(3):
             if x == 0:
                 self.MenuImage[x] = ImageTk.PhotoImage(Image.open('MyImage/Search.png'))
@@ -55,16 +81,18 @@ class MainGui:
             else:
                 self.MenuImage[x] = ImageTk.PhotoImage(Image.open('MyImage/Graph.png'))
 
-            self.MenuButton[x] = Button(window, borderwidth=0, image=self.MenuImage[x], bg=BACKCOLOR)
+            self.MenuButton[x] = Button(FrSearch, borderwidth=0, image=self.MenuImage[x], bg=BACKCOLOR)
             self.MenuButton[x].pack()
             self.MenuButton[x].place(x=30, y=220 + x*120)
+        '''
+
 
     def InitInputEmailandFileButton(self):
         global EmailButton
         global EmailImage
 
         EmailImage = ImageTk.PhotoImage(Image.open('MyImage/Gmail.png'))
-        EmailButton = Button(window, image=EmailImage, bg=BACKCOLOR, borderwidth=0, command=self.EmailButtonAction)
+        EmailButton = Button(FrSearch, image=EmailImage, bg=BACKCOLOR, borderwidth=0, command=self.EmailButtonAction)
         EmailButton.pack()
         EmailButton.place(x=500, y=420)
 
@@ -74,7 +102,7 @@ class MainGui:
         FileImage = ImageTk.PhotoImage(Image.open('MyImage/File.png'))
         # resize_img = img.resize((100, 80), Image.ANTIALIAS)
         # FileImage = ImageTk.PhotoImage(resize_img)
-        FileButton = Button(window, image=FileImage, bg=BACKCOLOR, borderwidth=0, command=self.FileButtonAction)
+        FileButton = Button(FrSearch, image=FileImage, bg=BACKCOLOR, borderwidth=0, command=self.FileButtonAction)
         FileButton.pack()
         FileButton.place(x=650, y=420)
 
@@ -83,7 +111,7 @@ class MainGui:
 
         self.TempFont = ('Consolas', 15)
 
-        SearchComboBox = ttk.Combobox(window, font=self.TempFont,state="readonly", width=10, values=["정렬기준",
+        SearchComboBox = ttk.Combobox(FrSearch, font=self.TempFont,state="readonly", width=10, values=["정렬기준",
                                                                                   "날짜순",
                                                                                   "가격순",
                                                                                   "지역번호순"])
@@ -96,28 +124,28 @@ class MainGui:
     def InitRadioButton(self):
         # 정렬 라디오
         self.radioUpDownVar = IntVar()
-        radioDownOrder = Radiobutton(window, text="내림차순", value=1, variable=self.radioUpDownVar)
+        radioDownOrder = Radiobutton(FrSearch, text="내림차순", value=1, variable=self.radioUpDownVar)
         radioDownOrder.pack()
         radioDownOrder.place(x=300, y=120)
         # self.radioDownOrder.highlightcolor(1,1,1)
 
-        radioUpOrder = Radiobutton(window, text="오름차순", value=2, variable=self.radioUpDownVar)
+        radioUpOrder = Radiobutton(FrSearch, text="오름차순", value=2, variable=self.radioUpDownVar)
         radioUpOrder.pack()
         radioUpOrder.place(x=370, y=120)
         radioUpOrder.select()
 
         # 검색 라디오
         self.radioSearchTypeVar = IntVar()
-        radioSale = Radiobutton(window, text="매매", value=1, variable=self.radioSearchTypeVar)
+        radioSale = Radiobutton(FrSearch, text="매매", value=1, variable=self.radioSearchTypeVar)
         radioSale.pack()
         radioSale.place(x=250, y=80)
         radioSale.select()
 
-        radioJeonse = Radiobutton(window, text="전세", value=2, variable=self.radioSearchTypeVar)
+        radioJeonse = Radiobutton(FrSearch, text="전세", value=2, variable=self.radioSearchTypeVar)
         radioJeonse.pack()
         radioJeonse.place(x=300, y=80)
 
-        radioMonthRent = Radiobutton(window, text="월세", value=3, variable=self.radioSearchTypeVar)
+        radioMonthRent = Radiobutton(FrSearch, text="월세", value=3, variable=self.radioSearchTypeVar)
         radioMonthRent.pack()
         radioMonthRent.place(x=350, y=80)
 
@@ -126,7 +154,7 @@ class MainGui:
         global sidoComboBox
         global sigunguComboBox
 
-        sidoComboBox = ttk.Combobox(window, font=self.TempFont, state="readonly", width=7, values=["시/도",
+        sidoComboBox = ttk.Combobox(FrSearch, font=self.TempFont, state="readonly", width=7, values=["시/도",
                                                     "서울특별시",
                                                     "부산광역시",
                                                     "인천광역시",
@@ -137,7 +165,7 @@ class MainGui:
         sidoComboBox.current(0)
         sidoComboBox.place(x=150, y=160)
 
-        sigunguComboBox = ttk.Combobox(window, font=self.TempFont, state="readonly", width=12, values=self.sigungulst)
+        sigunguComboBox = ttk.Combobox(FrSearch, font=self.TempFont, state="readonly", width=12, values=self.sigungulst)
         sigunguComboBox.option_add('*TCombobox*Listbox.font', self.TempFont)
         #sigunguComboBox.bind("<<ComboboxSelected>>", self.sigunguSelected)
         sigunguComboBox.current(0)
@@ -155,13 +183,13 @@ class MainGui:
         global yearComboBox
         global monthComboBox
 
-        yearComboBox = ttk.Combobox(window,font=self.TempFont, state="readonly", width=7, values=self.yearList)
+        yearComboBox = ttk.Combobox(FrSearch,font=self.TempFont, state="readonly", width=7, values=self.yearList)
         yearComboBox.option_add('*TCombobox*Listbox.font', self.TempFont)
         yearComboBox.bind("<<ComboboxSelected>>")
         yearComboBox.current(0)
         yearComboBox.place(x=150, y=200)
 
-        monthComboBox = ttk.Combobox(window,font=self.TempFont, state="readonly", width=7, values=self.monthList)
+        monthComboBox = ttk.Combobox(FrSearch,font=self.TempFont, state="readonly", width=7, values=self.monthList)
         monthComboBox.option_add('*TCombobox*Listbox.font', self.TempFont)
         monthComboBox.bind("<<ComboboxSelected>>")
         monthComboBox.current(0)
@@ -177,7 +205,7 @@ class MainGui:
         sigunguComboBox['values'] = self.sigungulst
 
     def InitInputLabel(self):
-        self.SearchButton = Button(window, font=self.TempFont, text="검색", command=self.SearchButtonAction,
+        self.SearchButton = Button(FrSearch, font=self.TempFont, text="검색", command=self.SearchButtonAction,
                                    height=1, bg='DarkGray')
         self.SearchButton.pack()
         self.SearchButton.place(x=420, y=155)
@@ -195,7 +223,7 @@ class MainGui:
         from xml.dom.minidom import parse, parseString
 
         Code = localCode.Locallst[sidoComboBox.current()-1][sigunguComboBox.current()][0]
-        #print("지역코드:", Code)
+        print("지역코드:", Code)
         year = str(2021-yearComboBox.current())
         #print("년",year)
         month = str(monthComboBox.current())
@@ -208,7 +236,7 @@ class MainGui:
         str1 = "openapi.molit.go.kr"
         str2 = "/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev?serviceKey=U9TRdwhUQTkPIk4fvhtKRx%2BGV970UoDYMjy%2Br3IHsDKyVaj5ToULtpWNGDe%2FGW1TvnVjX37G%2FwLhhk5TMP5IbQ%3D%3D&pageNo=1&numOfRows=1000&LAWD_CD="
 
-        if self.radioSearchTypeVar.get() == 2:
+        if self.radioSearchTypeVar.get() != 1:
             str1 += ":8081"
             str2 = "/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptRent?serviceKey=U9TRdwhUQTkPIk4fvhtKRx%2BGV970UoDYMjy%2Br3IHsDKyVaj5ToULtpWNGDe%2FGW1TvnVjX37G%2FwLhhk5TMP5IbQ%3D%3D&LAWD_CD="
 
@@ -249,17 +277,30 @@ class MainGui:
                             indList[3] = 17 + fixIndex
                             indList[4] = 18 + fixIndex
 
-                        elif self.radioSearchTypeVar.get() == 2: #전세
+                        else:
                             indList[0] = 2
-                            indList[1] = 3
+                            if self.radioSearchTypeVar.get() == 2:
+                                indList[1] = 3
+                            else:
+                                indList[1] = 6
+
                             indList[2] = 1
                             indList[3] = 5
                             indList[4] = 7
 
-                        DataList.append((subitems[indList[0]].firstChild.nodeValue,
+                            if (self.radioSearchTypeVar.get() == 2 and (subitems[6].firstChild.nodeValue).replace(" ","") != '0')\
+                                    or (self.radioSearchTypeVar.get() == 3 and (subitems[6].firstChild.nodeValue).replace(" ","") == '0'):
+                                continue
+
+                        if self.radioSearchTypeVar.get() != 3:
+                            DataList.append((subitems[indList[0]].firstChild.nodeValue,
                                          subitems[indList[1]].firstChild.nodeValue,
                                          int(subitems[indList[2]].firstChild.nodeValue), int(subitems[indList[3]].firstChild.nodeValue),int(subitems[indList[4]].firstChild.nodeValue)))
-
+                        else:
+                            DataList.append((subitems[indList[0]].firstChild.nodeValue,
+                                             subitems[indList[1]].firstChild.nodeValue,
+                                             int(subitems[indList[2]].firstChild.nodeValue), int(subitems[indList[3]].firstChild.nodeValue), int(subitems[indList[4]].firstChild.nodeValue),
+                                             subitems[3].firstChild.nodeValue))
 
                 #정렬
                 iSearchIndex = SearchComboBox.current()
@@ -287,34 +328,16 @@ class MainGui:
                     SearchDataButtonList[x].destroy()
 
                 for i in range(len(DataList)):
-                    but = Button(self.ButtonFrame, text="법정동: " + DataList[i][0] +
-                                                        "\n 가격: " + DataList[i][1] +
-                                                        "\n 날짜: " + str(DataList[i][2])+ "년 " + str(DataList[i][3]) + "월 " + str(DataList[i][4]) + "일", width=38, height=5,
+                    str1 = "법정동: " + DataList[i][0] + "\n 가격: " + DataList[i][1]
+
+                    if self.radioSearchTypeVar.get() == 3:
+                        str1 += "\n보증금: " + DataList[i][5]
+
+                    but = Button(self.ButtonFrame, text=str1 + "\n 날짜: " + str(DataList[i][2])+ "년 " + str(DataList[i][3]) + "월 " + str(DataList[i][4]) + "일", width=38, height=5,
                                  command=lambda col=i: self.DataButtonAction(col))
 
                     but.grid(row=i)
                     SearchDataButtonList.append(but)
-
-                '''
-                for i in range(len(DataList)):
-                    RenderText.insert(INSERT, "[")
-                    RenderText.insert(INSERT, i + 1)
-                    RenderText.insert(INSERT, "] ")
-                    RenderText.insert(INSERT, "법정동: ")
-                    RenderText.insert(INSERT, DataList[i][0])
-                    RenderText.insert(INSERT, "\n")
-                    RenderText.insert(INSERT, "거래금액: ")
-                    RenderText.insert(INSERT, DataList[i][1])
-                    RenderText.insert(INSERT, "\n")
-                    RenderText.insert(INSERT, "날짜: ")
-                    RenderText.insert(INSERT, DataList[i][2])
-                    RenderText.insert(INSERT, "년 ")
-                    RenderText.insert(INSERT, DataList[i][3])
-                    RenderText.insert(INSERT, "월 ")
-                    RenderText.insert(INSERT, DataList[i][4])
-                    RenderText.insert(INSERT, "일 ")
-                    RenderText.insert(INSERT, "\n\n")
-                '''
 
 
     def DataButtonAction(self, col):
@@ -323,26 +346,9 @@ class MainGui:
         print(DataList[col])
     def InitRenderText(self):
         global RenderText
-        frame = Frame(window, width = 100, height = 170, relief = 'raised')
+        frame = Frame(FrSearch, width = 100, height = 170, relief = 'raised')
         frame.pack()
         frame.place(x=150, y=240)
-
-        '''
-        RenderTextScrollbar = Scrollbar(frame)
-        RenderTextScrollbar.pack()
-        #RenderTextScrollbar.place(x=450, y=200)
-
-        TempFont = font.Font(frame, size=20, family='Consolas')
-        RenderText = Text(frame, font=self.TempFont, width=27, height=14, borderwidth=1,
-                          yscrollcommand=RenderTextScrollbar.set)
-        RenderText.pack()
-        #RenderText.place(x=150, y=200)
-
-        RenderTextScrollbar.config(command=RenderText.yview)
-        RenderTextScrollbar.pack(side=RIGHT, fill=Y)
-
-        RenderText.configure(state='disabled')
-        '''
 
         global SearchCanvas
         SearchCanvas = Canvas(frame, bg='#FFFFFF', width=300, height=300, scrollregion=(0, 0, 50, 0))
@@ -431,8 +437,26 @@ class MainGui:
 
 
         #LogoLabel.place(x=10, y=10)
+
+    def InitGraph(self):
+        data2 = [100, 550]
+        start = 0
+        s = sum(data2)
+        c2 = tk.Canvas(FrGraph, width=300, height=300, bg=BACKCOLOR, borderwidth=0, relief = 'raised')
+        c2.pack()
+        c2.place(x=100,y=300)
+        for i in range(len(data2)):
+            extent = data2[i] / s * 360
+            color = '#'
+            colors = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
+            for i in range(6):
+                color += colors[random.randint(0, 15)]
+            c2.create_arc((0, 0, 300, 300), fill=color, outline='white', start=start, extent=extent)
+            start = start + extent
+
     def logoButtonAction(self):
-        Canvas(window, bg=BACKCOLOR, width=WINCX, height=WINCY).pack()
+        #Canvas(window, bg=BACKCOLOR, width=WINCX, height=WINCY).pack()
+        self.InitNoteBook()
         self.logoScreenImgButton.destroy()
         self.InitInputImage()
         self.InitSearchListBox()
@@ -441,6 +465,7 @@ class MainGui:
         self.InitInputLabel()
         self.InitInputEmailandFileButton()
         self.InitRenderText()
+        self.InitGraph()
         localCode.ReadLocalCode()
         window.mainloop()
 
@@ -448,7 +473,7 @@ class MainGui:
         #window = Tk()
         window.title("Find Home")
 
-        window.geometry(str(WINCX) + "x" + str(WINCY))
+        #window.geometry(str(WINCX) + "x" + str(WINCY))
 
         self.LogoWindow()
         # self.InitInputImage()
