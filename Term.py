@@ -86,7 +86,6 @@ class MainGui:
             self.MenuButton[x].place(x=30, y=220 + x*120)
         '''
 
-
     def InitInputEmailandFileButton(self):
         global EmailButton
         global EmailImage
@@ -114,12 +113,10 @@ class MainGui:
         SearchComboBox = ttk.Combobox(FrSearch, font=self.TempFont,state="readonly", width=10, values=["정렬기준",
                                                                                   "날짜순",
                                                                                   "가격순",
-                                                                                  "지역번호순"])
-        SearchComboBox.bind("<<ComboboxSelected>>", self.sidoSelected)
+                                                                                  "지역이름순"])
+        #SearchComboBox.bind("<<ComboboxSelected>>", self.sidoSelected)
         SearchComboBox.current(0)
         SearchComboBox.place(x=150, y=120)
-
-
 
     def InitRadioButton(self):
         # 정렬 라디오
@@ -206,7 +203,7 @@ class MainGui:
 
     def InitInputLabel(self):
         self.SearchButton = Button(FrSearch, font=self.TempFont, text="검색", command=self.SearchButtonAction,
-                                   height=1, bg='DarkGray')
+                                   height=1, bg='white')
         self.SearchButton.pack()
         self.SearchButton.place(x=420, y=155)
 
@@ -215,6 +212,7 @@ class MainGui:
         #RenderText.delete(0.0, END)
 
         self.SearchData()
+        self.DrawGraph()
 
         #RenderText.configure(state='disabled')
 
@@ -222,6 +220,7 @@ class MainGui:
         import http.client
         from xml.dom.minidom import parse, parseString
 
+        print("콥보인덱스",sidoComboBox.current(), sigunguComboBox.current())
         Code = localCode.Locallst[sidoComboBox.current()-1][sigunguComboBox.current()][0]
         print("지역코드:", Code)
         year = str(2021-yearComboBox.current())
@@ -292,17 +291,20 @@ class MainGui:
                                     or (self.radioSearchTypeVar.get() == 3 and (subitems[6].firstChild.nodeValue).replace(" ","") == '0'):
                                 continue
 
+                        moneyInt = int(subitems[indList[1]].firstChild.nodeValue.replace(",",""))
                         if self.radioSearchTypeVar.get() != 3:
                             DataList.append((subitems[indList[0]].firstChild.nodeValue,
-                                         subitems[indList[1]].firstChild.nodeValue,
+                                         moneyInt,
                                          int(subitems[indList[2]].firstChild.nodeValue), int(subitems[indList[3]].firstChild.nodeValue),int(subitems[indList[4]].firstChild.nodeValue)))
                         else:
+                            rentMoney = int(subitems[3].firstChild.nodeValue.replace(",",""))
                             DataList.append((subitems[indList[0]].firstChild.nodeValue,
-                                             subitems[indList[1]].firstChild.nodeValue,
+                                             moneyInt,
                                              int(subitems[indList[2]].firstChild.nodeValue), int(subitems[indList[3]].firstChild.nodeValue), int(subitems[indList[4]].firstChild.nodeValue),
-                                             subitems[3].firstChild.nodeValue))
-
+                                             rentMoney))
+                #문자열 정렬이상함
                 #정렬
+
                 iSearchIndex = SearchComboBox.current()
                 if iSearchIndex == 1:
                     if self.radioUpDownVar.get() == 1:
@@ -328,10 +330,10 @@ class MainGui:
                     SearchDataButtonList[x].destroy()
 
                 for i in range(len(DataList)):
-                    str1 = "법정동: " + DataList[i][0] + "\n 가격: " + DataList[i][1]
+                    str1 = "법정동: " + DataList[i][0] + "\n 가격: " + str(DataList[i][1])
 
                     if self.radioSearchTypeVar.get() == 3:
-                        str1 += "\n보증금: " + DataList[i][5]
+                        str1 += "\n보증금: " + str(DataList[i][5])
 
                     but = Button(self.ButtonFrame, text=str1 + "\n 날짜: " + str(DataList[i][2])+ "년 " + str(DataList[i][3]) + "월 " + str(DataList[i][4]) + "일", width=38, height=5,
                                  command=lambda col=i: self.DataButtonAction(col))
@@ -339,11 +341,11 @@ class MainGui:
                     but.grid(row=i)
                     SearchDataButtonList.append(but)
 
-
     def DataButtonAction(self, col):
         tkinter.messagebox.showinfo('저장성공','즐겨찾기에 저장했습니다.')
         bookmark.insertBookmark(DataList[col])
         print(DataList[col])
+
     def InitRenderText(self):
         global RenderText
         frame = Frame(FrSearch, width = 100, height = 170, relief = 'raised')
@@ -439,20 +441,53 @@ class MainGui:
         #LogoLabel.place(x=10, y=10)
 
     def InitGraph(self):
-        data2 = [100, 550]
+        global GraphCanvas
+        GraphCanvas = Canvas(FrSearch, width=500, height=300, bg=BACKCOLOR, borderwidth=0, relief='raised')
+        GraphCanvas.pack()
+        GraphCanvas.place(x=700, y=300)
+
+    def DrawGraph(self):
+        GraphCanvas.delete('graph')
+
+        strList = []
+        if self.radioSearchTypeVar.get() != 3:
+            strList = [['1억 미만', 10000], ['1~3억',30000], ['3~10억',100000], ['10억 이상']]
+        else:
+            strList = [['10만 미만', 10], ['10~30만',30], ['30~100만',100], ['100만 이상']]
+
+        moneyList = [0] * 4
+        for i in range(len(DataList)):
+            #moneyStr = DataList[i][1]
+            #moneyStr = moneyStr.replace(',','')
+            money = DataList[i][1]
+
+            if money < strList[0][1]:
+                moneyList[0] += 1
+            elif money < strList[1][1]:
+                moneyList[1] += 1
+            elif money < strList[2][1]:
+                moneyList[2] += 1
+            else:
+                moneyList[3] += 1
         start = 0
-        s = sum(data2)
-        c2 = tk.Canvas(FrGraph, width=300, height=300, bg=BACKCOLOR, borderwidth=0, relief = 'raised')
-        c2.pack()
-        c2.place(x=100,y=300)
-        for i in range(len(data2)):
-            extent = data2[i] / s * 360
+        s = sum(moneyList)
+
+        for i in range(4):
+            strList[i][0] += '(' + str( int((moneyList[i]/s * 100)*100)/100 ) + '%)'
+
+
+        GraphCanvas.create_text(400, 50 , text="총"+ str(s) +"개 가격비율", font = ("나눔고딕코딩", 13), tags='graph')
+
+        for i in range(len(moneyList)):
+            extent = moneyList[i] / s * 360
             color = '#'
             colors = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
-            for i in range(6):
-                color += colors[random.randint(0, 15)]
-            c2.create_arc((0, 0, 300, 300), fill=color, outline='white', start=start, extent=extent)
+            for x in range(6):
+                color += colors[x+i*3]
+            GraphCanvas.create_arc((0, 0, 300, 300), fill=color, outline='white', start=start, extent=extent, tags='graph')
             start = start + extent
+            GraphCanvas.create_rectangle(350, 80 + 20 * i, 300 + 30, 80 + 20 * (i + 1), fill=color, tags='graph')
+            GraphCanvas.create_text(350 + 80, 70 + 20 * (i + 1), text=strList[i][0], tags='graph')
 
     def logoButtonAction(self):
         #Canvas(window, bg=BACKCOLOR, width=WINCX, height=WINCY).pack()
