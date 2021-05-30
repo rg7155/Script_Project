@@ -347,8 +347,8 @@ class MainGui:
         print(DataList[col])
 
         # 데이터에서 위도 경도 얻어와서 해당하는 위도 경도 넣고 아파트이름 문자열 넣기
-        map.CreateHmtlandReload([37.36636, 127.10654], '샘플데이터')
-
+        map.CreateHmtl([37.36636, 127.10654], '샘플데이터')
+        map.Reload()
 
 
 
@@ -486,11 +486,10 @@ class MainGui:
 
         self.mapFrame = Frame(window, width=600, height=400, relief='raised')
         self.mapFrame.pack()
-        self.mapFrame.place(x=500, y=145)
+        self.mapFrame.place(x=600, y=145)
 
 
         map.CreateHmtl([37.39298, 126.90521], '우리집')
-        map.SetChild(self.mapFrame)
         map.Pressed(self.mapFrame)
 
     def __init__(self):
