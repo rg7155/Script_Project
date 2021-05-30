@@ -18,7 +18,7 @@ from Bookmark import *
 import tkinter.messagebox
 import map
 import  random
-
+SearchUIOffSet = [-100,0]
 WINCX = 1280
 WINCY = 720
 window = Tk()
@@ -67,25 +67,11 @@ class MainGui:
         self.NameImage = ImageTk.PhotoImage(Image.open('MyImage/findhome.png'))
         self.NameLabel = Label(FrSearch, image=self.NameImage, bg=BACKCOLOR)
         self.NameLabel.pack()
-        self.NameLabel.place(x=160, y=5)
+        self.NameLabel.place(x=50, y=5)
 
         self.MenuButton=[0]*3
         self.MenuImage=[0]*3
 
-
-        '''
-        for x in range(3):
-            if x == 0:
-                self.MenuImage[x] = ImageTk.PhotoImage(Image.open('MyImage/Search.png'))
-            elif x == 1:
-                self.MenuImage[x] = ImageTk.PhotoImage(Image.open('MyImage/Bookmark.png'))
-            else:
-                self.MenuImage[x] = ImageTk.PhotoImage(Image.open('MyImage/Graph.png'))
-
-            self.MenuButton[x] = Button(FrSearch, borderwidth=0, image=self.MenuImage[x], bg=BACKCOLOR)
-            self.MenuButton[x].pack()
-            self.MenuButton[x].place(x=30, y=220 + x*120)
-        '''
 
     def InitInputEmailandFileButton(self):
         global EmailButton
@@ -94,7 +80,7 @@ class MainGui:
         EmailImage = ImageTk.PhotoImage(Image.open('MyImage/Gmail.png'))
         EmailButton = Button(FrSearch, image=EmailImage, bg=BACKCOLOR, borderwidth=0, command=self.EmailButtonAction)
         EmailButton.pack()
-        EmailButton.place(x=500, y=560)
+        EmailButton.place(x=50, y=560)
 
         global FileButton
         global FileImage
@@ -104,7 +90,7 @@ class MainGui:
         # FileImage = ImageTk.PhotoImage(resize_img)
         FileButton = Button(FrSearch, image=FileImage, bg=BACKCOLOR, borderwidth=0, command=self.FileButtonAction)
         FileButton.pack()
-        FileButton.place(x=650, y=560)
+        FileButton.place(x=200, y=560)
 
     def InitSearchListBox(self):
         global SearchComboBox #정렬조건
@@ -117,35 +103,35 @@ class MainGui:
                                                                                   "지역이름순"])
         #SearchComboBox.bind("<<ComboboxSelected>>", self.sidoSelected)
         SearchComboBox.current(0)
-        SearchComboBox.place(x=150, y=120)
+        SearchComboBox.place(x=150+SearchUIOffSet[0], y=120)
 
     def InitRadioButton(self):
         # 정렬 라디오
         self.radioUpDownVar = IntVar()
         radioDownOrder = Radiobutton(FrSearch, text="내림차순", value=1, variable=self.radioUpDownVar)
         radioDownOrder.pack()
-        radioDownOrder.place(x=300, y=120)
+        radioDownOrder.place(x=300+SearchUIOffSet[0], y=120)
         # self.radioDownOrder.highlightcolor(1,1,1)
 
         radioUpOrder = Radiobutton(FrSearch, text="오름차순", value=2, variable=self.radioUpDownVar)
         radioUpOrder.pack()
-        radioUpOrder.place(x=370, y=120)
+        radioUpOrder.place(x=370+SearchUIOffSet[0], y=120)
         radioUpOrder.select()
 
         # 검색 라디오
         self.radioSearchTypeVar = IntVar()
         radioSale = Radiobutton(FrSearch, text="매매", value=1, variable=self.radioSearchTypeVar)
         radioSale.pack()
-        radioSale.place(x=250, y=80)
+        radioSale.place(x=150+SearchUIOffSet[0], y=80)
         radioSale.select()
 
         radioJeonse = Radiobutton(FrSearch, text="전세", value=2, variable=self.radioSearchTypeVar)
         radioJeonse.pack()
-        radioJeonse.place(x=300, y=80)
+        radioJeonse.place(x=200+SearchUIOffSet[0], y=80)
 
         radioMonthRent = Radiobutton(FrSearch, text="월세", value=3, variable=self.radioSearchTypeVar)
         radioMonthRent.pack()
-        radioMonthRent.place(x=350, y=80)
+        radioMonthRent.place(x=250+SearchUIOffSet[0], y=80)
 
     def InitSearchLocalList(self):
         self.sigungulst = ["시/군/구"]
@@ -161,13 +147,13 @@ class MainGui:
         sidoComboBox.option_add('*TCombobox*Listbox.font', self.TempFont)
         sidoComboBox.bind("<<ComboboxSelected>>", self.sidoSelected)
         sidoComboBox.current(0)
-        sidoComboBox.place(x=150, y=160)
+        sidoComboBox.place(x=150+SearchUIOffSet[0], y=160)
 
         sigunguComboBox = ttk.Combobox(FrSearch, font=self.TempFont, state="readonly", width=12, values=self.sigungulst)
         sigunguComboBox.option_add('*TCombobox*Listbox.font', self.TempFont)
         #sigunguComboBox.bind("<<ComboboxSelected>>", self.sigunguSelected)
         sigunguComboBox.current(0)
-        sigunguComboBox.place(x=260, y=160)
+        sigunguComboBox.place(x=260+SearchUIOffSet[0], y=160)
 
 
         self.yearList = ['년도']
@@ -185,18 +171,18 @@ class MainGui:
         yearComboBox.option_add('*TCombobox*Listbox.font', self.TempFont)
         yearComboBox.bind("<<ComboboxSelected>>")
         yearComboBox.current(0)
-        yearComboBox.place(x=150, y=200)
+        yearComboBox.place(x=150+SearchUIOffSet[0], y=200)
 
         monthComboBox = ttk.Combobox(FrSearch,font=self.TempFont, state="readonly", width=7, values=self.monthList)
         monthComboBox.option_add('*TCombobox*Listbox.font', self.TempFont)
         monthComboBox.bind("<<ComboboxSelected>>")
         monthComboBox.current(0)
-        monthComboBox.place(x=260, y=200)
+        monthComboBox.place(x=260+SearchUIOffSet[0], y=200)
 
     def sidoSelected(self, event):
         if event.widget.current() == 0:
             return
-        print(event.widget.get())
+        #print(event.widget.get())
         # 해당 시도와 일치하는 리스트 가져와서 시/군/구 리스트에 넣기
         self.sigungulst.append("시/도")
         self.sigungulst = localCode.Comboboxlst[event.widget.current()-1]
@@ -206,7 +192,7 @@ class MainGui:
         self.SearchButton = Button(FrSearch, font=self.TempFont, text="검색", command=self.SearchButtonAction,
                                    height=1, bg='white')
         self.SearchButton.pack()
-        self.SearchButton.place(x=420, y=155)
+        self.SearchButton.place(x=420+SearchUIOffSet[0], y=155)
 
     def SearchButtonAction(self):
         #RenderText.configure(state='normal')
@@ -221,7 +207,6 @@ class MainGui:
         import http.client
         from xml.dom.minidom import parse, parseString
 
-        print("콥보인덱스",sidoComboBox.current(), sigunguComboBox.current())
         Code = localCode.Locallst[sidoComboBox.current()-1][sigunguComboBox.current()][0]
         print("지역코드:", Code)
         year = str(2021-yearComboBox.current())
@@ -354,7 +339,7 @@ class MainGui:
         global RenderText
         frame = Frame(FrSearch, width = 100, height = 170, relief = 'raised')
         frame.pack()
-        frame.place(x=150, y=240)
+        frame.place(x=150+SearchUIOffSet[0], y=240)
 
         global SearchCanvas
         SearchCanvas = Canvas(frame, bg='#FFFFFF', width=300, height=300, scrollregion=(0, 0, 50, 0))
@@ -368,14 +353,6 @@ class MainGui:
 
         global SearchDataButtonList
         SearchDataButtonList = []
-        '''
-
-        for _ in range(10):
-            but = Button(self.ButtonFrame, text=str(_) + "법정동:\n 가격:", width = 38, height = 5)
-            but.grid(row=_)
-            SearchDataButtonList.append(but)
-        SearchDataButtonList[0].destroy()
-        '''
 
         SearchCanvas.create_window(0, 0, anchor='nw', window=self.ButtonFrame)
 
@@ -456,7 +433,7 @@ class MainGui:
         global GraphCanvas
         GraphCanvas = Canvas(FrSearch, width=500, height=300, bg=BACKCOLOR, borderwidth=0, relief='raised')
         GraphCanvas.pack()
-        GraphCanvas.place(x=700, y=300)
+        GraphCanvas.place(x=500, y=400)
 
     def DrawGraph(self):
         GraphCanvas.delete('graph')
@@ -517,7 +494,7 @@ class MainGui:
 
         self.mapFrame = Frame(window, width=600, height=400, relief='raised')
         self.mapFrame.pack()
-        self.mapFrame.place(x=500, y=145)
+        self.mapFrame.place(x=600, y=10)
 
 
         map.CreateHmtl([37.39298, 126.90521], '우리집')
