@@ -333,7 +333,8 @@ class MainGui:
         print(DataList[col])
 
         # 데이터에서 위도 경도 얻어와서 해당하는 위도 경도 넣고 아파트이름 문자열 넣기
-        map.CreateHmtlandReload([37.36636, 127.10654], '샘플데이터')
+        map.CreateHmtl([37.36636, 127.10654], '샘플데이터')
+        map.Reload()
 
     def InitRenderText(self):
         global RenderText
@@ -433,7 +434,7 @@ class MainGui:
         global GraphCanvas
         GraphCanvas = Canvas(FrSearch, width=500, height=300, bg=BACKCOLOR, borderwidth=0, relief='raised')
         GraphCanvas.pack()
-        GraphCanvas.place(x=500, y=400)
+        GraphCanvas.place(x=500, y=410)
 
     def DrawGraph(self):
         GraphCanvas.delete('graph')
@@ -498,7 +499,6 @@ class MainGui:
 
 
         map.CreateHmtl([37.39298, 126.90521], '우리집')
-        map.SetChild(self.mapFrame)
         map.Pressed(self.mapFrame)
 
     def __init__(self):
