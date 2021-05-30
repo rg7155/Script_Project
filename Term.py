@@ -16,6 +16,7 @@ from PIL import ImageTk, Image
 import localCode
 from Bookmark import *
 import tkinter.messagebox
+import map
 import  random
 
 WINCX = 1280
@@ -93,7 +94,7 @@ class MainGui:
         EmailImage = ImageTk.PhotoImage(Image.open('MyImage/Gmail.png'))
         EmailButton = Button(FrSearch, image=EmailImage, bg=BACKCOLOR, borderwidth=0, command=self.EmailButtonAction)
         EmailButton.pack()
-        EmailButton.place(x=500, y=420)
+        EmailButton.place(x=500, y=560)
 
         global FileButton
         global FileImage
@@ -103,7 +104,7 @@ class MainGui:
         # FileImage = ImageTk.PhotoImage(resize_img)
         FileButton = Button(FrSearch, image=FileImage, bg=BACKCOLOR, borderwidth=0, command=self.FileButtonAction)
         FileButton.pack()
-        FileButton.place(x=650, y=420)
+        FileButton.place(x=650, y=560)
 
     def InitSearchListBox(self):
         global SearchComboBox #정렬조건
@@ -346,6 +347,9 @@ class MainGui:
         bookmark.insertBookmark(DataList[col])
         print(DataList[col])
 
+        # 데이터에서 위도 경도 얻어와서 해당하는 위도 경도 넣고 아파트이름 문자열 넣기
+        map.CreateHmtlandReload([37.36636, 127.10654], '샘플데이터')
+
     def InitRenderText(self):
         global RenderText
         frame = Frame(FrSearch, width = 100, height = 170, relief = 'raised')
@@ -364,6 +368,14 @@ class MainGui:
 
         global SearchDataButtonList
         SearchDataButtonList = []
+        '''
+
+        for _ in range(10):
+            but = Button(self.ButtonFrame, text=str(_) + "법정동:\n 가격:", width = 38, height = 5)
+            but.grid(row=_)
+            SearchDataButtonList.append(but)
+        SearchDataButtonList[0].destroy()
+        '''
 
         SearchCanvas.create_window(0, 0, anchor='nw', window=self.ButtonFrame)
 
@@ -502,13 +514,20 @@ class MainGui:
         self.InitRenderText()
         self.InitGraph()
         localCode.ReadLocalCode()
-        window.mainloop()
+
+        self.mapFrame = Frame(window, width=600, height=400, relief='raised')
+        self.mapFrame.pack()
+        self.mapFrame.place(x=500, y=145)
+
+
+        map.CreateHmtl([37.39298, 126.90521], '우리집')
+        map.SetChild(self.mapFrame)
+        map.Pressed(self.mapFrame)
 
     def __init__(self):
         #window = Tk()
         window.title("Find Home")
-
-        #window.geometry(str(WINCX) + "x" + str(WINCY))
+        window.geometry(str(WINCX) + "x" + str(WINCY))
 
         self.LogoWindow()
         # self.InitInputImage()
