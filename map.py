@@ -37,7 +37,7 @@ def CreateHmtl(loc, popup):
     # 위도 경도 지정
     m = folium.Map(location=[loc[0], loc[1]], zoom_start=17)
     # 마커 지정
-    folium.Marker([loc[0], loc[1]], popup=popup).add_to(m)
+    folium.Marker([loc[0], loc[1]], tooltip=popup).add_to(m)
     # html 파일로 저장
     m.save('map.html')
 

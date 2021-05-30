@@ -23,7 +23,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_b23f712d9c13416ea28559bb2a459b0e {
+                #map_d8152d80c69948e4847352582a643e47 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -35,15 +35,15 @@
 </head>
 <body>    
     
-            <div class="folium-map" id="map_b23f712d9c13416ea28559bb2a459b0e" ></div>
+            <div class="folium-map" id="map_d8152d80c69948e4847352582a643e47" ></div>
         
 </body>
 <script>    
     
-            var map_b23f712d9c13416ea28559bb2a459b0e = L.map(
-                "map_b23f712d9c13416ea28559bb2a459b0e",
+            var map_d8152d80c69948e4847352582a643e47 = L.map(
+                "map_d8152d80c69948e4847352582a643e47",
                 {
-                    center: [37.39298, 126.90521],
+                    center: [37.5809193, 127.01605],
                     crs: L.CRS.EPSG3857,
                     zoom: 17,
                     zoomControl: true,
@@ -55,28 +55,23 @@
 
         
     
-            var tile_layer_9309cb66dc124f6b980ece9c894dfcb6 = L.tileLayer(
+            var tile_layer_bd79090260ed49639f7017da60006ed1 = L.tileLayer(
                 "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                 {"attribution": "Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
-            ).addTo(map_b23f712d9c13416ea28559bb2a459b0e);
+            ).addTo(map_d8152d80c69948e4847352582a643e47);
         
     
-            var marker_226106b260b44d54b5d186c62ff8b541 = L.marker(
-                [37.39298, 126.90521],
+            var marker_298daad494a14ecc835af66f3802325e = L.marker(
+                [37.5809193, 127.01605],
                 {}
-            ).addTo(map_b23f712d9c13416ea28559bb2a459b0e);
+            ).addTo(map_d8152d80c69948e4847352582a643e47);
         
     
-        var popup_1e51ebfa36a0432aa450611cd75d87d6 = L.popup({"maxWidth": "100%"});
-
+            marker_298daad494a14ecc835af66f3802325e.bindTooltip(
+                `<div>
+                      숭인동2-1
+                 </div>`,
+                {"sticky": true}
+            );
         
-            var html_9be92fb91077416c95ee1ce222712ae0 = $(`<div id="html_9be92fb91077416c95ee1ce222712ae0" style="width: 100.0%; height: 100.0%;">우리집</div>`)[0];
-            popup_1e51ebfa36a0432aa450611cd75d87d6.setContent(html_9be92fb91077416c95ee1ce222712ae0);
-        
-
-        marker_226106b260b44d54b5d186c62ff8b541.bindPopup(popup_1e51ebfa36a0432aa450611cd75d87d6)
-        ;
-
-        
-    
 </script>

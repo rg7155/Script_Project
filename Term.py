@@ -16,7 +16,7 @@ from PIL import ImageTk, Image
 import localCode
 from Bookmark import *
 import tkinter.messagebox
-import map
+import map, goglemaps
 import  random
 
 WINCX = 1280
@@ -265,7 +265,7 @@ class MainGui:
                     if item.nodeName == "item":
                         subitems = item.childNodes
 
-                        indList = [0]*5 #지역,금액,년,월,일
+                        indList = [0]*6 #지역,금액,년,월,일,지번
 
                         if self.radioSearchTypeVar.get() == 1: #매매
                             fixIndex = 0
@@ -277,6 +277,7 @@ class MainGui:
                             indList[2] = 2
                             indList[3] = 17 + fixIndex
                             indList[4] = 18 + fixIndex
+                            indList[5] = 21 + fixIndex
 
                         else:
                             indList[0] = 2
@@ -288,6 +289,7 @@ class MainGui:
                             indList[2] = 1
                             indList[3] = 5
                             indList[4] = 7
+                            indList[5] = 9
 
                             if (self.radioSearchTypeVar.get() == 2 and (subitems[6].firstChild.nodeValue).replace(" ","") != '0')\
                                     or (self.radioSearchTypeVar.get() == 3 and (subitems[6].firstChild.nodeValue).replace(" ","") == '0'):
@@ -296,12 +298,14 @@ class MainGui:
                         if self.radioSearchTypeVar.get() != 3:
                             DataList.append((subitems[indList[0]].firstChild.nodeValue,
                                          subitems[indList[1]].firstChild.nodeValue,
-                                         int(subitems[indList[2]].firstChild.nodeValue), int(subitems[indList[3]].firstChild.nodeValue),int(subitems[indList[4]].firstChild.nodeValue)))
+                                         int(subitems[indList[2]].firstChild.nodeValue), int(subitems[indList[3]].firstChild.nodeValue),int(subitems[indList[4]].firstChild.nodeValue),
+                                         subitems[indList[5]].firstChild.nodeValue))
                         else:
                             DataList.append((subitems[indList[0]].firstChild.nodeValue,
                                              subitems[indList[1]].firstChild.nodeValue,
                                              int(subitems[indList[2]].firstChild.nodeValue), int(subitems[indList[3]].firstChild.nodeValue), int(subitems[indList[4]].firstChild.nodeValue),
-                                             subitems[3].firstChild.nodeValue))
+                                             subitems[3].firstChild.nodeValue,
+                                             subitems[indList[5]].firstChild.nodeValue))
 
                 #정렬
                 iSearchIndex = SearchComboBox.current()
@@ -344,10 +348,19 @@ class MainGui:
     def DataButtonAction(self, col):
         tkinter.messagebox.showinfo('저장성공','즐겨찾기에 저장했습니다.')
         bookmark.insertBookmark(DataList[col])
+
         print(DataList[col])
 
-        # 데이터에서 위도 경도 얻어와서 해당하는 위도 경도 넣고 아파트이름 문자열 넣기
-        map.CreateHmtl([37.36636, 127.10654], '샘플데이터')
+        # 법정도 지번번
+        if len(DataList[col]) == 6:
+            str = DataList[col][0] + DataList[col][5]
+        else:
+            str = DataList[col][0] + DataList[col][6]
+
+        location = goglemaps.getGeocode(str)
+
+        map.CreateHmtl([location['lat'], location['lng']], str)
+
         map.Reload()
 
 
