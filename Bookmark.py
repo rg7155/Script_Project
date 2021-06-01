@@ -5,13 +5,12 @@ class BookMark():
     def insertBookmark(self, data):
         self.BookMarkList.append(data)
 
-
     def getBookMarkList(self):
         dataStr = ''
         for i in range(len(self.BookMarkList)):
             tmp = "법정동: " + self.BookMarkList[i][0]
             tmp += "\n 가격: "
-            tmp += self.BookMarkList[i][1]
+            tmp += str(self.BookMarkList[i][1])
             tmp += "\n 날짜: "
             tmp += str(self.BookMarkList[i][2])
             tmp += "년 "

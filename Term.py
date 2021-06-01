@@ -18,6 +18,8 @@ from Bookmark import *
 import tkinter.messagebox
 import map, goglemaps
 import  random
+import teller
+
 SearchUIOffSet = [-100,0]
 WINCX = 1280
 WINCY = 720
@@ -91,6 +93,14 @@ class MainGui:
         FileButton = Button(FrSearch, image=FileImage, bg=BACKCOLOR, borderwidth=0, command=self.FileButtonAction)
         FileButton.pack()
         FileButton.place(x=200, y=560)
+
+        global TeleButton
+        global TeleImage
+
+        TeleImage = ImageTk.PhotoImage(Image.open('MyImage/telegram.png'))
+        TeleButton = Button(FrSearch, image=TeleImage, bg=BACKCOLOR, borderwidth=0, command=self.TeleButtonAction)
+        TeleButton.pack()
+        TeleButton.place(x=350, y=560)
 
     def InitSearchListBox(self):
         global SearchComboBox #정렬조건
@@ -391,6 +401,9 @@ class MainGui:
 
         sendButton.pack(side='left')
         EmailWindow.mainloop()
+    def TeleButtonAction(self):
+        teller.InitTele(bookmark.getBookMarkList())
+
 
     def sendMail(self):
         global host, port
