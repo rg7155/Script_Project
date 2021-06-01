@@ -446,9 +446,15 @@ class MainGui:
         s.close()
 
         print("Mail sending complete!!!")
+        tkinter.messagebox.showinfo('메일 전송',recipientAddr +'에\n메일전송했습니다.')
 
     def FileButtonAction(self):
-        pass
+        file = open('Find Home Bookmark list.txt', 'w')
+        file.write('★★★★★즐겨찾기된 목록입니다!★★★★★\n\n')
+        file.write(bookmark.getBookMarkList())
+        file.write('★★★★★즐겨찾기된 목록 끝입니다!★★★★★')
+        file.close()
+        tkinter.messagebox.showinfo('파일 저장','파일 저장 성공!')
 
     def LogoWindow(self):
         self.logoScreenImg = ImageTk.PhotoImage(Image.open('MyImage/logoScreen.PNG'))
