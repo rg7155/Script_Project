@@ -27,7 +27,12 @@ class BookMark():
         if isEndSpace:
             tmp += '\n\n'
         return tmp
-
+    def getDongandNum(self, i):
+        if len(self.BookMarkList[i]) == 6:
+            str = self.BookMarkList[i][0] + self.BookMarkList[i][5]
+        else:
+            str = self.BookMarkList[i][0] + self.BookMarkList[i][6]
+        return str
     def InitBookmarkPage(self):
         pass
         # global SearchCanvas

@@ -447,7 +447,8 @@ class MainGui:
 
     def BMDataButAct(self, col):
         #tkinter.messagebox.showinfo('세부사항','즐겨찾기에 저장했습니다.')
-        bookmark.insertBookmark(DataList[col])
+        # 즐겨찾기에서 클릭하면 추가되는 문제
+        #bookmark.insertBookmark(DataList[col])
 
         DetailRenderText.configure(state='normal')
         DetailRenderText.delete(0.0, END)  # ?댁쟾 異쒕젰 ?띿뒪??紐⑤몢 ??젣
@@ -459,11 +460,10 @@ class MainGui:
         DetailRenderText.insert(INSERT, DetailDataList[col][2])
         DetailRenderText.configure(state='disabled')
 
-        ''''
+        str = bookmark.getDongandNum(col)
         location = goglemaps.getGeocode(str)
         map.CreateHmtl([location['lat'], location['lng']], str)
         map.Reload()
-        '''
 
 
     def EmailButtonAction(self):
