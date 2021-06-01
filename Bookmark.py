@@ -5,24 +5,30 @@ class BookMark():
     def insertBookmark(self, data):
         self.BookMarkList.append(data)
 
-
-    def getBookMarkList(self):
+    def getBookMarkListAllString(self):
         dataStr = ''
         for i in range(len(self.BookMarkList)):
-            tmp = "법정동: " + self.BookMarkList[i][0]
-            tmp += "\n 가격: "
-            tmp += self.BookMarkList[i][1]
-            tmp += "\n 날짜: "
-            tmp += str(self.BookMarkList[i][2])
-            tmp += "년 "
-            tmp += str(self.BookMarkList[i][3])
-            tmp += "월 "
-            tmp += str(self.BookMarkList[i][4])
-            tmp += "일\n\n"
-            dataStr += tmp
+            dataStr += self.getString(i)
 
         return str(dataStr)
 
+    def getLength(self):
+        return len(self.BookMarkList)
+
+    def getString(self, i, isEndSpace):
+        tmp = "법정동: " + self.BookMarkList[i][0]
+        tmp += "\n 가격: "
+        tmp += str(self.BookMarkList[i][1])
+        tmp += "\n 날짜: "
+        tmp += str(self.BookMarkList[i][2])
+        tmp += "년 "
+        tmp += str(self.BookMarkList[i][3])
+        tmp += "월 "
+        tmp += str(self.BookMarkList[i][4])
+        tmp += "일"
+        if isEndSpace:
+            tmp += '\n\n'
+        return tmp
 
     def InitBookmarkPage(self):
         pass

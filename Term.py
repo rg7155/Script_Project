@@ -23,6 +23,7 @@ WINCX = 1280
 WINCY = 720
 window = Tk()
 DataList = []
+DetailDataList = []
 BACKCOLOR = 'LightSlateGray'
 host = "smtp.gmail.com" # Gmail SMTP 서버 주소.
 port = "587"
@@ -231,8 +232,9 @@ class MainGui:
         req = conn.getresponse()
         print(req.status, req.reason)
 
-        global DataList, SearchComboBox
+        global DataList,DetailDataList, SearchComboBox
         DataList.clear()
+        DetailDataList.clear()
 
         if req.status == 200:
             BooksDoc = req.read().decode('utf-8')
@@ -250,6 +252,7 @@ class MainGui:
                         subitems = item.childNodes
 
                         indList = [0]*6 #지역,금액,년,월,일,지번
+                        detailIndList = [0]*3 #아파트, 면적, 층
 
                         if self.radioSearchTypeVar.get() == 1: #매매
                             fixIndex = 0
@@ -262,6 +265,11 @@ class MainGui:
                             indList[3] = 17 + fixIndex
                             indList[4] = 18 + fixIndex
                             indList[5] = 21 + fixIndex
+
+                            detailIndList[0] = 16+ fixIndex
+                            detailIndList[1] = 20+ fixIndex
+                            detailIndList[2] = 23+ fixIndex
+
 
                         else:
                             indList[0] = 2
@@ -285,6 +293,10 @@ class MainGui:
                                          moneyInt,
                                          int(subitems[indList[2]].firstChild.nodeValue), int(subitems[indList[3]].firstChild.nodeValue),int(subitems[indList[4]].firstChild.nodeValue),
                                          subitems[indList[5]].firstChild.nodeValue))
+
+                            DetailDataList.append((subitems[detailIndList[0]].firstChild.nodeValue,
+                                                   subitems[detailIndList[1]].firstChild.nodeValue,
+                                                   subitems[detailIndList[2]].firstChild.nodeValue))
 
                         else:
                             rentMoney = int(subitems[3].firstChild.nodeValue.replace(",",""))
@@ -372,6 +384,78 @@ class MainGui:
 
         SearchCanvas.create_window(0, 0, anchor='nw', window=self.ButtonFrame)
 
+    def InitRenderBookMark(self):
+        frame = Frame(FrBookMark, width = 100, height = 170, relief = 'raised')
+        frame.pack()
+        frame.place(x=150+SearchUIOffSet[0], y=240)
+
+        global BookMarkCanvas
+        BookMarkCanvas = Canvas(frame, bg='#FFFFFF', width=300, height=300, scrollregion=(0, 0, 50, 0))
+        bar = Scrollbar(frame, orient=VERTICAL)
+        bar.pack(side=RIGHT, fill=Y)
+        bar.config(command=BookMarkCanvas.yview)
+        BookMarkCanvas.config(width=300, height=300)
+        BookMarkCanvas.config(yscrollcommand=bar.set)
+        BookMarkCanvas.pack(side=LEFT, expand=True, fill=BOTH)
+        self.BookMarkButtonFrame = Frame(frame)
+
+        global BookmarkDataButtonList
+        BookmarkDataButtonList = []
+
+        BookMarkCanvas.create_window(0, 0, anchor='nw', window=self.BookMarkButtonFrame)
+
+        RefreshButton = Button(FrBookMark, text='Refresh', font=("Consolas", 18), command=self.BookMarkListRefreshButAct)
+        RefreshButton.pack()
+        RefreshButton.place(x=150+SearchUIOffSet[0],y=100)
+
+
+        global DetailRenderText
+        TempFont = font.Font(FrBookMark, size=10, family='Consolas')
+        DetailRenderText = Text(FrBookMark, width=49, height=20, borderwidth=12, relief='ridge')
+        DetailRenderText.pack()
+        DetailRenderText.place(x=500, y=410)
+
+        DetailRenderText.configure(state='disabled')
+
+    def BookMarkListRefreshButAct(self):
+        ListLength = bookmark.getLength()
+        # 스크롤 크기 재조정
+        BookMarkCanvas.config(scrollregion=(0, 0, 50, ListLength * 88))
+
+        # 버튼 삭제
+        for x in range(len(BookmarkDataButtonList)):
+            BookmarkDataButtonList[x].destroy()
+
+        for i in range(ListLength):
+            #print(bookmark.getString(i))
+            but = Button(self.BookMarkButtonFrame,
+                         text= bookmark.getString(i, False), width=38, height=5,
+                         command=lambda col=i: self.BMDataButAct(col))
+
+            but.grid(row=i)
+            BookmarkDataButtonList.append(but)
+
+    def BMDataButAct(self, col):
+        #tkinter.messagebox.showinfo('세부사항','즐겨찾기에 저장했습니다.')
+        bookmark.insertBookmark(DataList[col])
+
+        DetailRenderText.configure(state='normal')
+        DetailRenderText.delete(0.0, END)  # ?댁쟾 異쒕젰 ?띿뒪??紐⑤몢 ??젣
+        DetailRenderText.insert(INSERT, "아파트:")
+        DetailRenderText.insert(INSERT, DetailDataList[col][0])
+        DetailRenderText.insert(INSERT, "\n면적:")
+        DetailRenderText.insert(INSERT, DetailDataList[col][1])
+        DetailRenderText.insert(INSERT, "\n층:")
+        DetailRenderText.insert(INSERT, DetailDataList[col][2])
+        DetailRenderText.configure(state='disabled')
+
+        ''''
+        location = goglemaps.getGeocode(str)
+        map.CreateHmtl([location['lat'], location['lng']], str)
+        map.Reload()
+        '''
+
+
     def EmailButtonAction(self):
         # 보내는 이메일 주소적기
         EmailWindow = Tk()
@@ -414,7 +498,7 @@ class MainGui:
         msg['Subject'] = title
         msg['From'] = senderAddr
         msg['To'] = recipientAddr
-        msgtext = bookmark.getBookMarkList()
+        msgtext = bookmark.getBookMarkListAllString()
         msgPart = MIMEText(msgtext, 'plain')
         #bookPart = MIMEText(html, 'html', _charset='UTF-8')
 
@@ -512,6 +596,8 @@ class MainGui:
         self.mapFrame.pack()
         self.mapFrame.place(x=600, y=10)
 
+        self.InitRenderBookMark()
+
 
         map.CreateHmtl([37.39298, 126.90521], '우리집')
         map.Pressed(self.mapFrame)
@@ -519,7 +605,7 @@ class MainGui:
     def __init__(self):
         #window = Tk()
         window.title("Find Home")
-        window.geometry(str(WINCX) + "x" + str(WINCY))
+        #window.geometry(str(WINCX) + "x" + str(WINCY))
 
         self.LogoWindow()
         # self.InitInputImage()
