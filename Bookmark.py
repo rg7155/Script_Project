@@ -8,7 +8,8 @@ class BookMark():
     def getBookMarkListAllString(self):
         dataStr = ''
         for i in range(len(self.BookMarkList)):
-            dataStr += self.getString(i)
+            dataStr += self.getString(i, True)
+        return dataStr
 
     def getLength(self):
         return len(self.BookMarkList)
