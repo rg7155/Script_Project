@@ -51,10 +51,6 @@ class MainGui:
         self.ph1 = ImageTk.PhotoImage(self.im1)
         notebook.add(FrBookMark, image = self.ph1, compound=tk.TOP)
 
-        self.im2 = Image.open('MyImage/Graph.png')
-        self.ph2 = ImageTk.PhotoImage(self.im2)
-        notebook.add(FrGraph, image = self.ph2, compound=tk.TOP)
-
         notebook.pack()
 
     def InitInputImage(self):
@@ -76,14 +72,14 @@ class MainGui:
         self.MenuImage=[0]*3
 
 
-    def InitInputEmailandFileButton(self):
+    def InitInputEmailandFileButton(self,frame):
         global EmailButton
         global EmailImage
 
         EmailImage = ImageTk.PhotoImage(Image.open('MyImage/Gmail.png'))
-        EmailButton = Button(FrSearch, image=EmailImage, bg=BACKCOLOR, borderwidth=0, command=self.EmailButtonAction)
+        EmailButton = Button(frame, image=EmailImage, bg=BACKCOLOR, borderwidth=0, command=self.EmailButtonAction)
         EmailButton.pack()
-        EmailButton.place(x=50, y=560)
+        EmailButton.place(x=450+SearchUIOffSet[0],y=200)
 
         global FileButton
         global FileImage
@@ -91,17 +87,17 @@ class MainGui:
         FileImage = ImageTk.PhotoImage(Image.open('MyImage/File.png'))
         # resize_img = img.resize((100, 80), Image.ANTIALIAS)
         # FileImage = ImageTk.PhotoImage(resize_img)
-        FileButton = Button(FrSearch, image=FileImage, bg=BACKCOLOR, borderwidth=0, command=self.FileButtonAction)
+        FileButton = Button(frame, image=FileImage, bg=BACKCOLOR, borderwidth=0, command=self.FileButtonAction)
         FileButton.pack()
-        FileButton.place(x=200, y=560)
+        FileButton.place(x=450+SearchUIOffSet[0],y=350)
 
         global TeleButton
         global TeleImage
 
         TeleImage = ImageTk.PhotoImage(Image.open('MyImage/telegram.png'))
-        TeleButton = Button(FrSearch, image=TeleImage, bg=BACKCOLOR, borderwidth=0, command=self.TeleButtonAction)
+        TeleButton = Button(frame, image=TeleImage, bg=BACKCOLOR, borderwidth=0, command=self.TeleButtonAction)
         TeleButton.pack()
-        TeleButton.place(x=350, y=560)
+        TeleButton.place(x=450+SearchUIOffSet[0],y=500)
 
     def InitSearchListBox(self):
         global SearchComboBox #정렬조건
@@ -118,31 +114,35 @@ class MainGui:
 
     def InitRadioButton(self):
         # 정렬 라디오
+        self.radioFont = ('Consolas', 12)
+
         self.radioUpDownVar = IntVar()
-        radioDownOrder = Radiobutton(FrSearch, text="내림차순", value=1, variable=self.radioUpDownVar)
+        radioDownOrder = Radiobutton(FrSearch, text="내림차순", value=1, variable=self.radioUpDownVar, font=self.radioFont, bg=BACKCOLOR)
         radioDownOrder.pack()
-        radioDownOrder.place(x=300+SearchUIOffSet[0], y=120)
+        radioDownOrder.place(x=290+SearchUIOffSet[0], y=120)
         # self.radioDownOrder.highlightcolor(1,1,1)
 
-        radioUpOrder = Radiobutton(FrSearch, text="오름차순", value=2, variable=self.radioUpDownVar)
+
+        radioUpOrder = Radiobutton(FrSearch, text="오름차순", value=2, variable=self.radioUpDownVar, font=self.radioFont, bg=BACKCOLOR)
         radioUpOrder.pack()
-        radioUpOrder.place(x=370+SearchUIOffSet[0], y=120)
+        radioUpOrder.place(x=380+SearchUIOffSet[0], y=120)
         radioUpOrder.select()
 
         # 검색 라디오
         self.radioSearchTypeVar = IntVar()
-        radioSale = Radiobutton(FrSearch, text="매매", value=1, variable=self.radioSearchTypeVar)
+        #self.radioFont = ('Consolas', 15)
+        radioSale = Radiobutton(FrSearch, text="매매", value=1, variable=self.radioSearchTypeVar, font=self.TempFont, bg=BACKCOLOR)
         radioSale.pack()
         radioSale.place(x=150+SearchUIOffSet[0], y=80)
         radioSale.select()
 
-        radioJeonse = Radiobutton(FrSearch, text="전세", value=2, variable=self.radioSearchTypeVar)
+        radioJeonse = Radiobutton(FrSearch, text="전세", value=2, variable=self.radioSearchTypeVar, font=self.TempFont, bg=BACKCOLOR)
         radioJeonse.pack()
-        radioJeonse.place(x=200+SearchUIOffSet[0], y=80)
+        radioJeonse.place(x=220+SearchUIOffSet[0], y=80)
 
-        radioMonthRent = Radiobutton(FrSearch, text="월세", value=3, variable=self.radioSearchTypeVar)
+        radioMonthRent = Radiobutton(FrSearch, text="월세", value=3, variable=self.radioSearchTypeVar, font=self.TempFont, bg=BACKCOLOR)
         radioMonthRent.pack()
-        radioMonthRent.place(x=250+SearchUIOffSet[0], y=80)
+        radioMonthRent.place(x=290+SearchUIOffSet[0], y=80)
 
     def InitSearchLocalList(self):
         self.sigungulst = ["시/군/구"]
@@ -337,20 +337,26 @@ class MainGui:
                         DataList.sort(key=lambda x: x[0])
 
                 #스크롤 크기 재조정
-                SearchCanvas.config(scrollregion=(0, 0, 50, len(DataList) * 88))
+                SearchCanvas.config(scrollregion=(0, 0, 50, len(DataList) * 90))
 
                 #버튼 삭제
                 for x in range(len(SearchDataButtonList)):
                     SearchDataButtonList[x].destroy()
 
                 for i in range(len(DataList)):
-                    str1 = "법정동: " + DataList[i][0] + "\n 가격: " + str(DataList[i][1])
+                    str1 = "법정동:" + DataList[i][0] + "\n 가격: " + str(DataList[i][1])
 
                     if self.radioSearchTypeVar.get() == 3:
                         str1 += "\n보증금: " + str(DataList[i][5])
 
-                    but = Button(self.ButtonFrame, text=str1 + "\n 날짜: " + str(DataList[i][2])+ "년 " + str(DataList[i][3]) + "월 " + str(DataList[i][4]) + "일", width=42, height=5,
-                                 command=lambda col=i: self.DataButtonAction(col))
+                    if i%2:
+                        backColor = 'SkyBlue'
+                    else:
+                        backColor = 'SteelBlue'
+
+                    but = Button(self.ButtonFrame, text=str1 + "\n 날짜: " + str(DataList[i][2])+ "년 " + str(DataList[i][3]) + "월 " + str(DataList[i][4]) + "일", width=25, height=4,
+                                 command=lambda col=i: self.DataButtonAction(col), font=self.radioFont,
+                                 anchor='w', justify='left', bg=backColor, borderwidth=0, padx=36)
 
                     but.grid(row=i)
                     SearchDataButtonList.append(but)
@@ -358,7 +364,7 @@ class MainGui:
     def DataButtonAction(self, col):
         tkinter.messagebox.showinfo('저장성공','즐겨찾기에 저장했습니다.')
         bookmark.insertBookmark(DataList[col])
-
+        SearchDataButtonList[col].configure(bg='Gold')
         print(DataList[col])
 
         # 법정도 지번번
@@ -375,16 +381,17 @@ class MainGui:
 
     def InitRenderText(self):
         global RenderText
-        frame = Frame(FrSearch, width = 100, height = 170, relief = 'raised')
+        frame = Frame(FrSearch, width=100, height=170, relief = 'raised')
         frame.pack()
         frame.place(x=150+SearchUIOffSet[0], y=240)
 
         global SearchCanvas
-        SearchCanvas = Canvas(frame, bg='#FFFFFF', width=300, height=300, scrollregion=(0, 0, 50, 0))
+        SearchCanvas = Canvas(frame, bg=BACKCOLOR, width=300, height=300, scrollregion=(0, 0, 50, 0))
         bar = Scrollbar(frame, orient=VERTICAL)
         bar.pack(side=RIGHT, fill=Y)
         bar.config(command=SearchCanvas.yview)
-        SearchCanvas.config(width=300, height=300)
+
+        SearchCanvas.config(width=300, height=400)
         SearchCanvas.config(yscrollcommand=bar.set)
         SearchCanvas.pack(side=LEFT, expand=True, fill=BOTH)
         self.ButtonFrame = Frame(frame)
@@ -397,14 +404,16 @@ class MainGui:
     def InitRenderBookMark(self):
         frame = Frame(FrBookMark, width = 100, height = 170, relief = 'raised')
         frame.pack()
-        frame.place(x=150+SearchUIOffSet[0], y=240)
-
+        frame.place(x=150+SearchUIOffSet[0], y=150)
+        bookmarkLogo = Label(FrBookMark, image=self.NameImage, bg=BACKCOLOR)
+        bookmarkLogo.pack()
+        bookmarkLogo.place(x=50,y=5)
         global BookMarkCanvas
         BookMarkCanvas = Canvas(frame, bg='#FFFFFF', width=300, height=300, scrollregion=(0, 0, 50, 0))
         bar = Scrollbar(frame, orient=VERTICAL)
         bar.pack(side=RIGHT, fill=Y)
         bar.config(command=BookMarkCanvas.yview)
-        BookMarkCanvas.config(width=300, height=300)
+        BookMarkCanvas.config(width=260, height=500)
         BookMarkCanvas.config(yscrollcommand=bar.set)
         BookMarkCanvas.pack(side=LEFT, expand=True, fill=BOTH)
         self.BookMarkButtonFrame = Frame(frame)
@@ -413,17 +422,26 @@ class MainGui:
         BookmarkDataButtonList = []
 
         BookMarkCanvas.create_window(0, 0, anchor='nw', window=self.BookMarkButtonFrame)
+        self.refreshImg = Image.open('MyImage/refresh.png')
+        self.refreshPI = ImageTk.PhotoImage(self.refreshImg)
 
-        RefreshButton = Button(FrBookMark, text='Refresh', font=("Consolas", 18), command=self.BookMarkListRefreshButAct)
+        RefreshLabel = Label(FrBookMark, text='즐겨찾기 목록', font=("Consolas", 20), bg=BACKCOLOR)
+        RefreshLabel.place(x=160+SearchUIOffSet[0], y=100)
+        RefreshButton = Button(FrBookMark , command=self.BookMarkListRefreshButAct,
+                               bg='LightSteelBlue',borderwidth=0, image=self.refreshPI)
         RefreshButton.pack()
-        RefreshButton.place(x=150+SearchUIOffSet[0],y=100)
+        RefreshButton.place(x=400+SearchUIOffSet[0],y=100)
 
+        self.InitInputEmailandFileButton(FrBookMark)
 
         global DetailRenderText
-        TempFont = font.Font(FrBookMark, size=10, family='Consolas')
-        DetailRenderText = Text(FrBookMark, width=49, height=20, borderwidth=12, relief='ridge')
+        DetailLabel = Label(FrBookMark,text='상세 정보', font=("Consolas", 20), bg=BACKCOLOR)
+        DetailLabel.pack()
+        DetailLabel.place(x=500,y=470)
+        TempFont = font.Font(FrBookMark, size=15, family='Consolas')
+        DetailRenderText = Text(FrBookMark, width=35, height=3, borderwidth=1,font=TempFont)
         DetailRenderText.pack()
-        DetailRenderText.place(x=500, y=410)
+        DetailRenderText.place(x=500, y=510)
 
         DetailRenderText.configure(state='disabled')
 
@@ -439,8 +457,9 @@ class MainGui:
         for i in range(ListLength):
             #print(bookmark.getString(i))
             but = Button(self.BookMarkButtonFrame,
-                         text= bookmark.getString(i, False), width=42, height=5,
-                         command=lambda col=i: self.BMDataButAct(col))
+                         text= bookmark.getString(i, False), width=20, height=4,
+                         command=lambda col=i: self.BMDataButAct(col), font=self.radioFont,
+                                 anchor='w', justify='left', bg='Gold', borderwidth=1, padx=36)
 
             but.grid(row=i)
             BookmarkDataButtonList.append(but)
@@ -486,7 +505,7 @@ class MainGui:
         sendButton.pack(side='left')
         EmailWindow.mainloop()
     def TeleButtonAction(self):
-        teller.InitTele(bookmark.getBookMarkList())
+        teller.InitTele(bookmark.getBookMarkListAllString())
 
 
     def sendMail(self):
@@ -535,7 +554,7 @@ class MainGui:
     def FileButtonAction(self):
         file = open('Find Home Bookmark list.txt', 'w')
         file.write('★★★★★즐겨찾기된 목록입니다!★★★★★\n\n')
-        file.write(bookmark.getBookMarkList())
+        file.write(bookmark.getBookMarkListAllString())
         file.write('★★★★★즐겨찾기된 목록 끝입니다!★★★★★')
         file.close()
         tkinter.messagebox.showinfo('파일 저장','파일 저장 성공!')
@@ -637,7 +656,6 @@ class MainGui:
         self.InitRadioButton()
         self.InitSearchLocalList()
         self.InitInputLabel()
-        self.InitInputEmailandFileButton()
         self.InitRenderText()
         self.InitGraph()
         localCode.ReadLocalCode()

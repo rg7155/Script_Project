@@ -76,5 +76,5 @@ def InitTele(bookmarklst):
     print('Listening...')
     noti.sendMessage(1773658412, """ 어서오세요. Find Home 텔레그램입니다.\n\n<명령어 메뉴>\n1.즐겨찾기: 즐겨찾기된 데이터를 출력합니다.\n
     """)
-    while 1:
-        time.sleep(10)
+
+
