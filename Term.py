@@ -16,7 +16,7 @@ import teller
 import spam
 
 SearchUIOffSet = [-100,0]
-WINCX = 1280
+WINCX = 1100
 WINCY = 720
 window = Tk()
 DataList = []
@@ -577,12 +577,12 @@ class MainGui:
         GraphCanvas.place(x=500, y=410)
 
         self.radioBarPie = IntVar()
-        radioBar= Radiobutton(FrSearch, text="막대", value=1, variable=self.radioBarPie,bg=BACKCOLOR, command = self.DrawGraph)
-        radioBar.place(x=920+SearchUIOffSet[0], y=420)
+        radioBar= Radiobutton(FrSearch, text="막대", value=1, font=('Consolas', 12),variable=self.radioBarPie,bg=BACKCOLOR, command = self.DrawGraph)
+        radioBar.place(x=910+SearchUIOffSet[0], y=420)
         # self.radioDownOrder.highlightcolor(1,1,1)
         radioBar.select()
 
-        radioUpPie  = Radiobutton(FrSearch, text="파이", value=2, variable=self.radioBarPie,bg=BACKCOLOR, command = self.DrawGraph)
+        radioUpPie  = Radiobutton(FrSearch, text="파이", value=2, font=('Consolas', 12), variable=self.radioBarPie,bg=BACKCOLOR, command = self.DrawGraph)
         radioUpPie .place(x=970+SearchUIOffSet[0], y=420)
 
     def DrawGraph(self):
@@ -629,7 +629,7 @@ class MainGui:
                 GraphCanvas.create_arc((0, 0, 300, 300), fill=color, outline='white', start=start, extent=extent, tags='graph')
                 start = start + extent
                 GraphCanvas.create_rectangle(350, 80 + 20 * i, 300 + 30, 80 + 20 * (i + 1), fill=color, tags='graph')
-                GraphCanvas.create_text(350 + 80, 70 + 20 * (i + 1), text=strList[i][0], tags='graph')
+                GraphCanvas.create_text(350 + 80, 70 + 20 * (i + 1), text=strList[i][0], tags='graph', font=('Consolas', 12))
         #막대
         else:
             y_gap = 20
@@ -648,7 +648,7 @@ class MainGui:
                 GraphCanvas.create_text(x0 + 15, y0, anchor=tk.SW, text=str(y),tags='graph')
 
                 GraphCanvas.create_rectangle(350, 80 + 20 * x, 300 + 30, 80 + 20 * (x + 1), fill=color, tags='graph')
-                GraphCanvas.create_text(350 + 80, 70 + 20 * (x + 1), text=strList[x][0], tags='graph')
+                GraphCanvas.create_text(350 + 80, 70 + 20 * (x + 1), text=strList[x][0], tags='graph', font=('Consolas', 12))
 
 
     def logoButtonAction(self):
