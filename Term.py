@@ -51,10 +51,6 @@ class MainGui:
         self.ph1 = ImageTk.PhotoImage(self.im1)
         notebook.add(FrBookMark, image = self.ph1, compound=tk.TOP)
 
-        self.im2 = Image.open('MyImage/Graph.png')
-        self.ph2 = ImageTk.PhotoImage(self.im2)
-        notebook.add(FrGraph, image = self.ph2, compound=tk.TOP)
-
         notebook.pack()
 
     def InitInputImage(self):
@@ -358,9 +354,9 @@ class MainGui:
                     else:
                         backColor = 'SteelBlue'
 
-                    but = Button(self.ButtonFrame, text=str1 + "\n 날짜: " + str(DataList[i][2])+ "년 " + str(DataList[i][3]) + "월 " + str(DataList[i][4]) + "일", width=20, height=4,
+                    but = Button(self.ButtonFrame, text=str1 + "\n 날짜: " + str(DataList[i][2])+ "년 " + str(DataList[i][3]) + "월 " + str(DataList[i][4]) + "일", width=25, height=4,
                                  command=lambda col=i: self.DataButtonAction(col), font=self.radioFont,
-                                 anchor='w', justify='left', bg=backColor, borderwidth=0, padx=38)
+                                 anchor='w', justify='left', bg=backColor, borderwidth=0, padx=36)
 
                     but.grid(row=i)
                     SearchDataButtonList.append(but)
@@ -390,11 +386,12 @@ class MainGui:
         frame.place(x=150+SearchUIOffSet[0], y=240)
 
         global SearchCanvas
-        SearchCanvas = Canvas(frame, bg=BACKCOLOR, width=260, height=300, scrollregion=(0, 0, 50, 0))
+        SearchCanvas = Canvas(frame, bg=BACKCOLOR, width=300, height=300, scrollregion=(0, 0, 50, 0))
         bar = Scrollbar(frame, orient=VERTICAL)
         bar.pack(side=RIGHT, fill=Y)
         bar.config(command=SearchCanvas.yview)
-        SearchCanvas.config(width=260, height=400)
+
+        SearchCanvas.config(width=300, height=400)
         SearchCanvas.config(yscrollcommand=bar.set)
         SearchCanvas.pack(side=LEFT, expand=True, fill=BOTH)
         self.ButtonFrame = Frame(frame)
@@ -462,7 +459,7 @@ class MainGui:
             but = Button(self.BookMarkButtonFrame,
                          text= bookmark.getString(i, False), width=20, height=4,
                          command=lambda col=i: self.BMDataButAct(col), font=self.radioFont,
-                                 anchor='w', justify='left', bg='Gold', borderwidth=1, padx=38)
+                                 anchor='w', justify='left', bg='Gold', borderwidth=1, padx=36)
 
             but.grid(row=i)
             BookmarkDataButtonList.append(but)
@@ -577,8 +574,16 @@ class MainGui:
     def InitGraph(self):
         global GraphCanvas
         GraphCanvas = Canvas(FrSearch, width=500, height=300, bg=BACKCOLOR, borderwidth=0, relief='raised')
-        GraphCanvas.pack()
         GraphCanvas.place(x=500, y=410)
+
+        self.radioBarPie = IntVar()
+        radioBar= Radiobutton(FrSearch, text="막대", value=1, variable=self.radioBarPie,bg=BACKCOLOR, command = self.DrawGraph)
+        radioBar.place(x=920+SearchUIOffSet[0], y=420)
+        # self.radioDownOrder.highlightcolor(1,1,1)
+        radioBar.select()
+
+        radioUpPie  = Radiobutton(FrSearch, text="파이", value=2, variable=self.radioBarPie,bg=BACKCOLOR, command = self.DrawGraph)
+        radioUpPie .place(x=970+SearchUIOffSet[0], y=420)
 
     def DrawGraph(self):
         GraphCanvas.delete('graph')
@@ -610,18 +615,41 @@ class MainGui:
             strList[i][0] += '(' + str( int((moneyList[i]/s * 100)*100)/100 ) + '%)'
 
 
-        GraphCanvas.create_text(400, 50 , text="총"+ str(s) +"개 가격비율", font = ("나눔고딕코딩", 13), tags='graph')
+        GraphCanvas.create_text(400, 50 , text="총"+ str(s) +"개 가격비율", font=self.TempFont, tags='graph')
 
-        for i in range(len(moneyList)):
-            extent = moneyList[i] / s * 360
-            color = '#'
-            colors = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
-            for x in range(6):
-                color += colors[x+i*3]
-            GraphCanvas.create_arc((0, 0, 300, 300), fill=color, outline='white', start=start, extent=extent, tags='graph')
-            start = start + extent
-            GraphCanvas.create_rectangle(350, 80 + 20 * i, 300 + 30, 80 + 20 * (i + 1), fill=color, tags='graph')
-            GraphCanvas.create_text(350 + 80, 70 + 20 * (i + 1), text=strList[i][0], tags='graph')
+        #파이
+        colors = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
+
+        if self.radioBarPie.get() == 2:
+            for i in range(4):
+                extent = moneyList[i] / s * 360
+                color = '#'
+                for x in range(6):
+                    color += colors[x+i*3]
+                GraphCanvas.create_arc((0, 0, 300, 300), fill=color, outline='white', start=start, extent=extent, tags='graph')
+                start = start + extent
+                GraphCanvas.create_rectangle(350, 80 + 20 * i, 300 + 30, 80 + 20 * (i + 1), fill=color, tags='graph')
+                GraphCanvas.create_text(350 + 80, 70 + 20 * (i + 1), text=strList[i][0], tags='graph')
+        #막대
+        else:
+            y_gap = 20
+            x_stretch = 10
+            x_width = 40
+            x_gap = 40
+            for x, y in enumerate(moneyList):
+                x0 = (x * x_stretch) + (x * x_width) + x_gap
+                y0 = 300 - (y * 200 / max(moneyList) + y_gap)
+                x1 = (x * x_stretch) + (x * x_width) + x_width + x_gap
+                y1 = 300 - y_gap
+                color = '#'
+                for z in range(6):
+                    color += colors[z+x*3]
+                GraphCanvas.create_rectangle(x0, y0, x1, y1, fill=color, tags='graph')
+                GraphCanvas.create_text(x0 + 15, y0, anchor=tk.SW, text=str(y),tags='graph')
+
+                GraphCanvas.create_rectangle(350, 80 + 20 * x, 300 + 30, 80 + 20 * (x + 1), fill=color, tags='graph')
+                GraphCanvas.create_text(350 + 80, 70 + 20 * (x + 1), text=strList[x][0], tags='graph')
+
 
     def logoButtonAction(self):
         #Canvas(window, bg=BACKCOLOR, width=WINCX, height=WINCY).pack()
