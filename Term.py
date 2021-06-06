@@ -1,12 +1,5 @@
-'''
-import urllib
-import http.client
-conn = http.client.HTTPConnection("openapi.molit.go.kr")
-conn.request("GET","/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev?serviceKey=U9TRdwhUQTkPIk4fvhtKRx%2BGV970UoDYMjy%2Br3IHsDKyVaj5ToULtpWNGDe%2FGW1TvnVjX37G%2FwLhhk5TMP5IbQ%3D%3D&pageNo=1&numOfRows=10&LAWD_CD=11110&DEAL_YMD=202012")
-req = conn.getresponse()
-print(req.status,req.reason)
-print(req.read().decode('utf-8'))
-'''
+# -*- coding: utf-8 -*-
+
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
@@ -15,10 +8,12 @@ from PIL import ImageTk, Image
 
 import localCode
 from Bookmark import *
+
 import tkinter.messagebox
 import map, goglemaps
 import  random
 import teller
+import spam
 
 SearchUIOffSet = [-100,0]
 WINCX = 1280
@@ -30,6 +25,11 @@ BACKCOLOR = 'LightSlateGray'
 host = "smtp.gmail.com" # Gmail SMTP 서버 주소.
 port = "587"
 bookmark = BookMark()
+
+import sys
+import io
+sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding = 'utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding = 'utf-8')
 
 class MainGui:
     def InitNoteBook(self):
@@ -517,7 +517,7 @@ class MainGui:
         title = "아파트 매매 가격 정보"
         senderAddr = "sungzzuu@gmail.com"
         recipientAddr = self.emailEntry.get()
-        passwd = "tjdwn*yunsj00"
+        passwd = spam.getSendInfo(senderAddr)
         #html = MakeHtmlDoc(SearchBookTitle(keyword))
 
         import mysmtplib
@@ -533,7 +533,11 @@ class MainGui:
         msg['Subject'] = title
         msg['From'] = senderAddr
         msg['To'] = recipientAddr
-        msgtext = bookmark.getBookMarkListAllString()
+        msgtext = '<Find Home>\n즐겨찾기된 아파트 실거래 자료입니다.\n\n'
+        msgtext += bookmark.getBookMarkListAllString()
+        last = '총 ' + str(bookmark.getLength()) +'개의 데이터입니다.\n'
+        msgtext += last
+
         msgPart = MIMEText(msgtext, 'plain')
         #bookPart = MIMEText(html, 'html', _charset='UTF-8')
 
